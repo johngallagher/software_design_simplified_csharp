@@ -1,0 +1,19 @@
+@model IEnumerable<MicropostsApp.Models.Micropost>
+
+<h2>Microposts</h2>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Content</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach (var micropost in Model)
+    {
+      <tr>
+        <td>@micropost.Content</td>
+      </tr>
+    }
+  </tbody>
+</table>
