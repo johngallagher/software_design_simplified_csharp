@@ -1,22 +1,24 @@
-@model MicropostsApp.Models.User
+@model RegisterViewModel
 @{
   ViewData["Title"] = "Sign Up";
   Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Sign Up</h2>
+<h2>Register</h2>
 
-<form asp-action="Create" asp-controller="Users" method="post">
-  <div asp-validation-summary="All" class="text-danger"></div>
-  <div>
-    <label for="Email">Email</label>
-    <input asp-for="Email" id="Email" name="Email" type="email" value="@Model.Email" required />
-    <span asp-validation-for="Email" class="text-danger"></span>
+<form method="post">
+  <div class="form-group">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <label asp-for="Email"></label>
+    <input asp-for="Email" class="form-control" />
   </div>
-  <div>
-    <label for="Password">Password</label>
-    <input asp-for="PasswordHash" id="Password" name="Password" type="password" required />
-    <span asp-validation-for="PasswordHash" class="text-danger"></span>
+  <div class="form-group">
+    <label asp-for="Password"></label>
+    <input asp-for="Password" class="form-control" />
   </div>
-  <button type="submit">Sign Up</button>
+  <div class="form-group">
+    <label asp-for="ConfirmPassword"></label>
+    <input asp-for="ConfirmPassword" class="form-control" />
+  </div>
+  <button type="submit" class="btn btn-primary">Register</button>
 </form>
