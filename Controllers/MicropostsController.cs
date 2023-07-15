@@ -37,7 +37,7 @@ namespace MicropostsApp.Controllers
             {
                 _context.Add(micropost);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Home");
             }
             return View(micropost);
         }

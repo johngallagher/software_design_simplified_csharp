@@ -1,0 +1,12 @@
+@model MicropostsApp.Models.Micropost
+
+<h2>Create Micropost</h2>
+
+<form method="post">
+  <div class="form-group">
+    <label asp-for="Content"></label>
+    <textarea asp-for="Content" class="form-control"></textarea>
+    <span asp-validation-for="Content" class="text-danger"></span>
+  </div>
+  <button type="submit" class="btn btn-primary">Create</button>
+</form>
