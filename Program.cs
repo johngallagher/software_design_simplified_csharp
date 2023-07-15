@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using MicropostsApp.Models;
 using MicropostsApp.Data;
+using Castle;
+using Castle.Config;
 
 internal class Program
 {
@@ -14,6 +16,8 @@ internal class Program
         builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
 
         builder.Services.AddControllersWithViews();
+
+        builder.Services.AddSingleton(new CastleClient(new CastleConfiguration(builder.Configuration["Castle:ApiSecret"])));
 
         var app = builder.Build();
 
