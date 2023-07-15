@@ -17,28 +17,11 @@ namespace MicropostsApp.Controllers
             _userManager = userManager;
         }
 
-        // GET: Users/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Users/Create
-        // [HttpPost]
-        // [ValidateAntiForgeryToken]
-        // public async Task<IActionResult> Create([Bind("Id,Email,PasswordHash")] User user)
-        // {
-        //     if (ModelState.IsValid)
-        //     {
-        //         _context.Add(user);
-        //         await _context.SaveChangesAsync();
-        //         // Send activation email...
-        //         return RedirectToAction("Index", "Home");
-        //     }
-        //     return View(user);
-        // }
-
-        // Other actions...
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RegisterViewModel model)
@@ -51,10 +34,7 @@ namespace MicropostsApp.Controllers
                 if (result.Succeeded)
                 {
                     var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-
-                    // Confirm the email
                     await _userManager.ConfirmEmailAsync(user, emailConfirmationToken);
-
 
                     return RedirectToAction("Index", "Home");
                 }
