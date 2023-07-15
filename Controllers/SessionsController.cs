@@ -19,13 +19,13 @@ namespace MicropostsApp.Controllers
             _signInManager = signInManager;
         }
 
-        public IActionResult Login()
+        public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Create(LoginViewModel model)
         {
 
             if (!ModelState.IsValid)
