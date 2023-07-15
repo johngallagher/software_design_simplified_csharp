@@ -17,7 +17,8 @@ namespace MicropostsApp.Controllers
         // GET: Users/Create
         public IActionResult Create()
         {
-            return View();
+            var user = new User();
+            return View(user);
         }
 
         // POST: Users/Create
@@ -30,7 +31,7 @@ namespace MicropostsApp.Controllers
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 // Send activation email...
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Home");
             }
             return View(user);
         }
