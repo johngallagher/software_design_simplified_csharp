@@ -46,8 +46,7 @@ namespace MicropostsApp.Controllers
                 {
                     Type = "$login",
                     Status = "$succeeded",
-                    RequestToken = "test|device:chrome_on_mac|risk:0.7",
-                    // RequestToken = model.castle_request_token,
+                    RequestToken = model.castle_request_token,
                     Context = Castle.Context.FromHttpRequest(Request),
                     User = new Dictionary<string, object>() {
                         {"id", user.Id},

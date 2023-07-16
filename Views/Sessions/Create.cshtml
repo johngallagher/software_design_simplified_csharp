@@ -1,3 +1,4 @@
+@using Microsoft.Extensions.DependencyInjection
 @model LoginViewModel
 
 <h2>Login</h2>
@@ -16,11 +17,17 @@
     <input id="RememberMe" name="RememberMe" type="checkbox" />
     <label for="RememberMe">Remember me?</label>
   </div>
+  @if (ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
+  {
+    <input type="hidden" name="castle_request_token" value="@Context.Request.Query["castleToken"]" />
+  }
   <button type="submit">Log in</button>
 </form>
 
 <script src="~/lib/@@castleio/castle-js/dist/castle.browser.js"></script>
 
+@if (!ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
+{
 <script>
   Castle.configure({ pk: 'pk_BxFYyLuiXEfpueKQoFzpfLaGN6LHWpS7' });
   var myForm = document.getElementById('loginForm');
@@ -30,3 +37,4 @@
     function (e) { Castle.injectTokenOnSubmit(e) }
   );
 </script>
+}
