@@ -15,19 +15,6 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MicropostsApp.styles.css" asp-append-version="true" />
-    <!-- Castle client side fingerprinting -->
-    <script src="@("https://d2t77mnxyo7adj.cloudfront.net/v1/c.js?" + Configuration["Castle:AppId"])"></script>
-
-    <!-- Update Castle's client side with user details -->
-    @if (SignInManager.IsSignedIn(User))
-    {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-        <script>
-            _castle('identify', '@(userId)'); // Set the current user's id
-            _castle('secure', '@Castle.Signature.Compute(Configuration["Castle:ApiSecret"], userId)'); // Set signature for secure mode
-        </script>
-    }
 </head>
 
 <body>
