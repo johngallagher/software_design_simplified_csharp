@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "jsx": "react",
+    "target": "es5",
+    "module": "es2015",
+    "lib": ["dom", "es5", "es2015.promise"],
+    "strict": true,
+    "sourceMap": true,
+    "declaration": true,
+    "skipLibCheck": true,
+    "checkJs": false,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "declarationDir": "dist/types",
+    "outDir": "dist/lib",
+    "paths": {
+      "lib": ["./lib"]
+    }
+  },
+  "include": ["src", "test", "rollup.config.ts", "internal-types.d.ts"]
+}

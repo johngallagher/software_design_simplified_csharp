@@ -1,0 +1,22 @@
+{
+  "name": "@castleio/castle-js",
+  "version": "2.2.0",
+  "description": "Castle Fingerprinting Script",
+  "main": "dist/castle.js",
+  "files": [
+    "dist/**/*"
+  ],
+  "types": [
+    "dist/castle.d.ts"
+  ],
+  "author": {
+    "name": "castle.io",
+    "url": "https://castle.io"
+  },
+  "homepage": "https://castle.io",
+  "license": "MIT",
+  "scripts": {
+    "prepack": "yarn clean-package",
+    "postpack": "yarn clean-package restore"
+  }
+}

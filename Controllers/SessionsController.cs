@@ -1,3 +1,6 @@
+using Castle;
+using Castle.Messages.Requests;
+using Castle.Infrastructure.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -11,12 +14,14 @@ namespace MicropostsApp.Controllers
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ApplicationDbContext _context;
+        private readonly CastleClient _castleClient;
 
-        public SessionsController(ApplicationDbContext context, UserManager<User> userManager, SignInManager<User> signInManager)
+        public SessionsController(ApplicationDbContext context, UserManager<User> userManager, SignInManager<User> signInManager, CastleClient castleClient)
         {
             _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
+            _castleClient = castleClient;
         }
 
         public IActionResult Create()
@@ -36,7 +41,35 @@ namespace MicropostsApp.Controllers
             var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: false, lockoutOnFailure: false);
             if (result.Succeeded)
             {
-                return RedirectToAction("Index", "Home");
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                var res = await _castleClient.Risk(new ActionRequest()
+                {
+                    Type = "$login",
+                    Status = "$succeeded",
+                    RequestToken = "test|device:chrome_on_mac|risk:0.7",
+                    // RequestToken = model.castle_request_token,
+                    Context = Castle.Context.FromHttpRequest(Request),
+                    User = new Dictionary<string, object>() {
+                        {"id", user.Id},
+                        {"email", user.Email},
+                    }
+                });
+
+                if (res.Risk <= 0.6)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else if (res.Risk > 0.6 && res.Risk < 0.9)
+                {
+                    // Challenge IP address
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    // Block IP address
+                    Response.StatusCode = 500;
+                    return View("Error500");
+                }
             }
             else
             {

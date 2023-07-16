@@ -2,7 +2,7 @@
 
 <h2>Login</h2>
 
-<form method="post">
+<form method="post" id="loginForm">
   <div asp-validation-summary="All" class="text-danger"></div>
   <div>
     <label for="Email">Email</label>
@@ -18,3 +18,15 @@
   </div>
   <button type="submit">Log in</button>
 </form>
+
+<script src="~/lib/@@castleio/castle-js/dist/castle.browser.js"></script>
+
+<script>
+  Castle.configure({ pk: 'pk_BxFYyLuiXEfpueKQoFzpfLaGN6LHWpS7' });
+  var myForm = document.getElementById('loginForm');
+
+  myForm.addEventListener(
+    'submit',
+    function (e) { Castle.injectTokenOnSubmit(e) }
+  );
+</script>

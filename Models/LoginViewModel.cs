@@ -11,4 +11,7 @@ public class LoginViewModel
 
   [Display(Name = "Remember me?")]
   public bool RememberMe { get; set; }
+
+  [Required]
+  public string castle_request_token { get; set; }
 }
