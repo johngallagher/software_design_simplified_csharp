@@ -1,3 +1,4 @@
+@using MicropostsApp.Extensions
 @model RegisterViewModel
 @{
     ViewData[index: "Title"] = "Sign Up";
@@ -6,9 +7,9 @@
 
 <h2>Register</h2>
 
-<form method="post">
+<form method="post" id="signupForm">
+    <div asp-validation-summary="All" class="text-danger"></div>
     <div class="form-group">
-        <div asp-validation-summary="All" class="text-danger"></div>
         <label asp-for="Email"></label>
         <input asp-for="Email" class="form-control"/>
     </div>
@@ -17,8 +18,28 @@
         <input asp-for="Password" class="form-control"/>
     </div>
     <div class="form-group">
-        <label asp-for="ConfirmPassword"></label>
+        <label asp-for="ConfirmPassword">Confirm Password</label>
         <input asp-for="ConfirmPassword" class="form-control"/>
     </div>
+    @if (ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
+    {
+        <input type="hidden" name="castle_request_token"
+            value="@Context.Request.Query.GetValueOrDefault(key: "castleToken", defaultValue: "test|device:chrome_on_mac|risk:0.0")" />
+    }
     <button type="submit" class="btn btn-primary">Register</button>
 </form>
+
+<script src="~/lib/@@castleio/castle-js/dist/castle.browser.js"></script>
+
+@if (!ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
+{
+    <script>
+  Castle.configure({ pk: 'pk_BxFYyLuiXEfpueKQoFzpfLaGN6LHWpS7' });
+  var myForm = document.getElementById('signupForm');
+
+  myForm.addEventListener(
+    'submit',
+    function (e) { Castle.injectTokenOnSubmit(e) }
+  );
+</script>
+}

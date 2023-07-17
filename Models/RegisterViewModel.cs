@@ -34,4 +34,7 @@ public class RegisterViewModel
         ErrorMessage = "The password and confirmation password do not match."
     )]
     public string ConfirmPassword { get; set; }
+    
+    [Required]
+    public string castle_request_token { get; set; }
 }
