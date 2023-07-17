@@ -59,13 +59,13 @@ public class MicropostsController : Controller
                 model: model
             );
 
-        var hackerLikelihood = await FetchHackerLikelihood(
+        var riskScore = await FetchRiskScore(
             type: "$custom",
             name: "Created a micropost",
             model: model
         );
 
-        if (hackerLikelihood >= HighRiskThreshold)
+        if (riskScore >= HighRiskThreshold)
         {
             await BlockIpAddress();
             Response.StatusCode = 500;
@@ -74,7 +74,7 @@ public class MicropostsController : Controller
             );
         }
 
-        if (hackerLikelihood >= MediumRiskThreshold && hackerLikelihood < HighRiskThreshold)
+        if (riskScore >= MediumRiskThreshold && riskScore < HighRiskThreshold)
         {
             await ChallengeIpAddress();
         }
@@ -92,7 +92,7 @@ public class MicropostsController : Controller
         );
     }
 
-    private async Task<float> FetchHackerLikelihood(
+    private async Task<float> FetchRiskScore(
         string type,
         string name,
         MicropostViewModel model

@@ -58,13 +58,13 @@ public class SessionsController : Controller
         );
         if (result.Succeeded)
         {
-            var hackerLikelihood = await FetchHackerLikelihood(
+            var riskScore = await FetchRiskScore(
                 type: "$login",
                 status: "$succeeded",
                 model: model
             );
 
-            if (hackerLikelihood >= HighRiskThreshold)
+            if (riskScore >= HighRiskThreshold)
             {
                 await BlockIpAddress();
                 Response.StatusCode = 500;
@@ -73,7 +73,7 @@ public class SessionsController : Controller
                 );
             }
 
-            if (hackerLikelihood >= MediumRiskThreshold && hackerLikelihood < HighRiskThreshold)
+            if (riskScore >= MediumRiskThreshold && riskScore < HighRiskThreshold)
             {
                 await ChallengeIpAddress();
             }
@@ -128,7 +128,7 @@ public class SessionsController : Controller
             );
     }
 
-    private async Task<float> FetchHackerLikelihood(
+    private async Task<float> FetchRiskScore(
         string type,
         string status,
         LoginViewModel model

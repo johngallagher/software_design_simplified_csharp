@@ -1,4 +1,5 @@
 using Castle;
+using MicropostsApp.Extensions;
 using Castle.Messages.Requests;
 using MicropostsApp.Data;
 using MicropostsApp.Models;
@@ -10,13 +11,13 @@ namespace MicropostsApp.Controllers;
 public class UsersController : Controller
 {
     private readonly ApplicationDbContext _context;
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager<User?> _userManager;
     private readonly CastleClient _castleClient;
     private readonly Cloudflare _cloudflare;
 
     public UsersController(
         ApplicationDbContext context,
-        UserManager<User> userManager,
+        UserManager<User?> userManager,
         CastleClient castleClient,
         Cloudflare cloudflare
     )
@@ -60,13 +61,15 @@ public class UsersController : Controller
 
         if (result.Succeeded)
         {
-            var hackerLikelihood = await FetchHackerLikelihood(
+            var riskScore = await this.FetchRiskScore(
                 type: "$registration",
                 status: "$succeeded",
-                model: model
+                model: model,
+                castleClient: _castleClient,
+                user: user
             );
 
-            if (hackerLikelihood >= HighRiskThreshold)
+            if (riskScore >= HighRiskThreshold)
             {
                 await BlockIpAddress();
                 Response.StatusCode = 500;
@@ -75,7 +78,7 @@ public class UsersController : Controller
                 );
             }
 
-            if (hackerLikelihood >= MediumRiskThreshold && hackerLikelihood < HighRiskThreshold)
+            if (riskScore >= MediumRiskThreshold && riskScore < HighRiskThreshold)
             {
                 await ChallengeIpAddress();
             }
@@ -92,14 +95,12 @@ public class UsersController : Controller
                 controllerName: "Sessions"
             );
         }
-        else
-        {
-            await NotifyFraudDetectionSystemOf(
-                type: "$registration",
-                status: "$failed",
-                model: model
-            );
-        }
+
+        await NotifyFraudDetectionSystemOf(
+            type: "$registration",
+            status: "$failed",
+            model: model
+        );
 
         foreach (var error in result.Errors)
             ModelState.AddModelError(
@@ -141,35 +142,6 @@ public class UsersController : Controller
             );
     }
 
-    private async Task<float> FetchHackerLikelihood(
-        string type,
-        string status,
-        RegisterViewModel model
-    )
-    {
-        var user = await _userManager.FindByEmailAsync(
-            email: model.Email
-        );
-        if (user == null) return 0;
-        var response = await _castleClient.Risk(
-            request: new ActionRequest
-            {
-                Type = type,
-                Status = status,
-                RequestToken = model.castle_request_token,
-                Context = Context.FromHttpRequest(
-                    request: Request
-                ),
-                User = new Dictionary<string, object>
-                {
-                    { "id", user.Id },
-                    { "email", user.Email ?? string.Empty }
-                }
-            }
-        );
-        return response.Risk;
-    }
-
     private async Task ChallengeIpAddress()
     {
         var ipAddress = GetIpAddress(
@@ -192,7 +164,7 @@ public class UsersController : Controller
         );
     }
 
-    public string GetIpAddress(
+    private string GetIpAddress(
         HttpContext context
     )
     {
