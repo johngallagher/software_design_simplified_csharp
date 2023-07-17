@@ -1,5 +1,4 @@
 using Castle;
-using Castle.Messages.Requests;
 using MicropostsApp.Extensions;
 using MicropostsApp.Models;
 using Microsoft.AspNetCore.Identity;
@@ -45,12 +44,13 @@ public class SessionsController : Controller
                 model: model
             );
 
-        await NotifyFraudDetectionSystemOf(
+        await this.NotifyFraudDetectionSystemOf(
             type: "$login",
             status: "$attempted",
-            model: model
+            model: model,
+            user: new User { Email = model.Email },
+            castleClient: _castleClient
         );
-
         var result = await _signInManager.PasswordSignInAsync(
             userName: model.Email,
             password: model.Password,
@@ -93,10 +93,12 @@ public class SessionsController : Controller
             );
         }
 
-        await NotifyFraudDetectionSystemOf(
+        await this.NotifyFraudDetectionSystemOf(
             type: "$login",
             status: "$failed",
-            model: model
+            model: model,
+            user: new User { Email = model.Email },
+            castleClient: _castleClient
         );
 
         ModelState.AddModelError(
@@ -106,34 +108,5 @@ public class SessionsController : Controller
         return View(
             model: model
         );
-    }
-
-    private async Task NotifyFraudDetectionSystemOf(
-        string type,
-        string status,
-        LoginViewModel model
-    )
-    {
-        var user = await _userManager.FindByEmailAsync(
-            email: model.Email
-        );
-
-        if (user != null)
-            await _castleClient.Filter(
-                request: new ActionRequest
-                {
-                    Type = type,
-                    Status = status,
-                    RequestToken = model.castle_request_token,
-                    Context = Context.FromHttpRequest(
-                        request: Request
-                    ),
-                    User = new Dictionary<string, object>
-                    {
-                        { "id", user.Id },
-                        { "email", user.Email ?? string.Empty }
-                    }
-                }
-            );
     }
 }

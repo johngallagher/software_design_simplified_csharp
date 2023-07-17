@@ -40,7 +40,10 @@ public static class ControllerExtensions
         return response.Risk;
     }
 
-    public static async Task ChallengeIpAddress(this Controller controller, Cloudflare cloudflare)
+    public static async Task ChallengeIpAddress(
+        this Controller controller,
+        Cloudflare cloudflare
+    )
     {
         var ipAddress = GetIpAddress(
             context: controller.Request.HttpContext
@@ -51,8 +54,11 @@ public static class ControllerExtensions
         );
     }
 
-    public static async Task BlockIpAddress(this Controller controller, Cloudflare cloudflare)
-    
+    public static async Task BlockIpAddress(
+        this Controller controller,
+        Cloudflare cloudflare
+    )
+
     {
         var ipAddress = GetIpAddress(
             context: controller.Request.HttpContext
@@ -81,7 +87,32 @@ public static class ControllerExtensions
 
         return context.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
     }
+
+    public static async Task NotifyFraudDetectionSystemOf(
+        this Controller controller,
+        string type,
+        string status,
+        IProtectable model,
+        User? user,
+        CastleClient castleClient
+    )
+    {
+        if (user != null)
+            await castleClient.Filter(
+                request: new ActionRequest
+                {
+                    Type = type,
+                    Status = status,
+                    RequestToken = model.castle_request_token,
+                    Context = Context.FromHttpRequest(
+                        request: controller.Request
+                    ),
+                    User = new Dictionary<string, object>
+                    {
+                        { "id", user.Id },
+                        { "email", user.Email ?? string.Empty }
+                    }
+                }
+            );
+    }
 }
-
-
-
