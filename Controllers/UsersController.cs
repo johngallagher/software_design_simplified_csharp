@@ -50,9 +50,9 @@ public class UsersController : Controller
         await this.NotifyFraudDetectionSystemOf(
             type: "$registration",
             status: "$attempted",
-            model: model,
-            user: user,
-            castleClient: _castleClient
+            userEmail: model.Email,
+            castleClient: _castleClient,
+            castleRequestToken: model.castle_request_token
         );
         var result = await _userManager.CreateAsync(
             user: user,
@@ -102,9 +102,9 @@ public class UsersController : Controller
         await this.NotifyFraudDetectionSystemOf(
             type: "$registration",
             status: "$failed",
-            model: model,
-            user: user,
-            castleClient: _castleClient
+            userEmail: model.Email,
+            castleClient: _castleClient,
+            castleRequestToken: model.castle_request_token
         );
 
         foreach (var error in result.Errors)

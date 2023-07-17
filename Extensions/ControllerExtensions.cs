@@ -92,27 +92,25 @@ public static class ControllerExtensions
         this Controller controller,
         string type,
         string status,
-        IProtectable model,
-        User? user,
-        CastleClient castleClient
+        string userEmail,
+        CastleClient castleClient,
+        string castleRequestToken
     )
     {
-        if (user != null)
-            await castleClient.Filter(
-                request: new ActionRequest
+        await castleClient.Filter(
+            request: new ActionRequest
+            {
+                Type = type,
+                Status = status,
+                RequestToken = castleRequestToken,
+                Context = Context.FromHttpRequest(
+                    request: controller.Request
+                ),
+                User = new Dictionary<string, object>
                 {
-                    Type = type,
-                    Status = status,
-                    RequestToken = model.castle_request_token,
-                    Context = Context.FromHttpRequest(
-                        request: controller.Request
-                    ),
-                    User = new Dictionary<string, object>
-                    {
-                        { "id", user.Id },
-                        { "email", user.Email ?? string.Empty }
-                    }
+                    { "email", userEmail }
                 }
-            );
+            }
+        );
     }
 }

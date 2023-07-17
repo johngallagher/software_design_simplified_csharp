@@ -47,9 +47,9 @@ public class SessionsController : Controller
         await this.NotifyFraudDetectionSystemOf(
             type: "$login",
             status: "$attempted",
-            model: model,
-            user: new User { Email = model.Email },
-            castleClient: _castleClient
+            userEmail: model.Email,
+            castleClient: _castleClient,
+            castleRequestToken: model.castle_request_token
         );
         var result = await _signInManager.PasswordSignInAsync(
             userName: model.Email,
@@ -96,9 +96,9 @@ public class SessionsController : Controller
         await this.NotifyFraudDetectionSystemOf(
             type: "$login",
             status: "$failed",
-            model: model,
-            user: new User { Email = model.Email },
-            castleClient: _castleClient
+            userEmail: model.Email,
+            castleClient: _castleClient,
+            castleRequestToken: model.castle_request_token
         );
 
         ModelState.AddModelError(
