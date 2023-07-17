@@ -31,6 +31,9 @@ public class SessionsController : Controller
         return View();
     }
 
+    private const float HighRiskThreshold = 0.8f;
+    private const float MediumRiskThreshold = 0.6f;
+
     [HttpPost]
     public async Task<IActionResult> Create(
         LoginViewModel model
@@ -61,7 +64,7 @@ public class SessionsController : Controller
                 model: model
             );
 
-            if (hackerLikelihood >= 0.8)
+            if (hackerLikelihood >= HighRiskThreshold)
             {
                 await BlockIpAddress();
                 Response.StatusCode = 500;
@@ -70,7 +73,7 @@ public class SessionsController : Controller
                 );
             }
 
-            if (hackerLikelihood >= 0.6 && hackerLikelihood < 0.8)
+            if (hackerLikelihood >= MediumRiskThreshold && hackerLikelihood < HighRiskThreshold)
             {
                 await ChallengeIpAddress();
             }
