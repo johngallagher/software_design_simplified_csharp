@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using MicropostsApp.Interfaces;
 
 namespace MicropostsApp.Models;
 
-public class MicropostViewModel
+public class MicropostViewModel : IProtectable
 {
     public int Id { get; set; }
 

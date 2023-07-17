@@ -1,6 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using MicropostsApp.Interfaces;
 
-public class LoginViewModel
+namespace MicropostsApp.Models;
+
+public class LoginViewModel : IProtectable
 {
     [Required] [EmailAddress] public string Email { get; set; }
 

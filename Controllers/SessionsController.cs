@@ -1,5 +1,6 @@
 using Castle;
 using Castle.Messages.Requests;
+using MicropostsApp.Extensions;
 using MicropostsApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -58,10 +59,14 @@ public class SessionsController : Controller
         );
         if (result.Succeeded)
         {
-            var riskScore = await FetchRiskScore(
+            var riskScore = await this.FetchRiskScore(
                 type: "$login",
                 status: "$succeeded",
-                model: model
+                model: model,
+                castleClient: _castleClient,
+                user: await _userManager.FindByEmailAsync(
+                    email: model.Email
+                )
             );
 
             if (riskScore >= HighRiskThreshold)
@@ -126,35 +131,6 @@ public class SessionsController : Controller
                     }
                 }
             );
-    }
-
-    private async Task<float> FetchRiskScore(
-        string type,
-        string status,
-        LoginViewModel model
-    )
-    {
-        var user = await _userManager.FindByEmailAsync(
-            email: model.Email
-        );
-        if (user == null) return 0;
-        var response = await _castleClient.Risk(
-            request: new ActionRequest
-            {
-                Type = type,
-                Status = status,
-                RequestToken = model.castle_request_token,
-                Context = Context.FromHttpRequest(
-                    request: Request
-                ),
-                User = new Dictionary<string, object>
-                {
-                    { "id", user.Id },
-                    { "email", user.Email }
-                }
-            }
-        );
-        return response.Risk;
     }
 
     private async Task ChallengeIpAddress()

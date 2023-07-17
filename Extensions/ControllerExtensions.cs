@@ -1,5 +1,6 @@
 using Castle;
 using Castle.Messages.Requests;
+using MicropostsApp.Interfaces;
 using MicropostsApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,7 +13,7 @@ public static class ControllerExtensions
         this Controller controller,
         string type,
         string status,
-        RegisterViewModel model,
+        IProtectable model,
         CastleClient castleClient,
         User? user
     )
