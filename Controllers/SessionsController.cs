@@ -83,6 +83,12 @@ public class SessionsController : Controller
             );
         }
 
+        await NotifyFraudDetectionSystemOf(
+            type: "$login",
+            status: "$failed",
+            model: model
+        );
+
         ModelState.AddModelError(
             key: string.Empty,
             errorMessage: result.ToString()

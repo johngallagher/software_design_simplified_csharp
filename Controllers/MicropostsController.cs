@@ -92,7 +92,6 @@ public class MicropostsController : Controller
         );
     }
 
-
     private async Task<float> FetchHackerLikelihood(
         string type,
         string name,
