@@ -19,6 +19,8 @@ internal class Program
 
         builder.Services.AddSingleton(new CastleClient(new CastleConfiguration(builder.Configuration["Castle:ApiSecret"])));
 
+        builder.Services.AddSingleton(new Cloudflare(builder.Configuration["Cloudflare:Email"], builder.Configuration["Cloudflare:Key"]));
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
