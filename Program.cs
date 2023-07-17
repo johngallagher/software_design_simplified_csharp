@@ -1,30 +1,55 @@
-using Microsoft.EntityFrameworkCore;
-using MicropostsApp.Models;
-using MicropostsApp.Data;
 using Castle;
 using Castle.Config;
+using MicropostsApp.Data;
+using MicropostsApp.Models;
+using Microsoft.EntityFrameworkCore;
 
 internal class Program
 {
-    private static void Main(string[] args)
+    private static void Main(
+        string[] args
+    )
     {
-        var builder = WebApplication.CreateBuilder(args);
+        var builder = WebApplication.CreateBuilder(
+            args: args
+        );
 
-        builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Services.AddDbContext<ApplicationDbContext>(
+            optionsAction: options => options.UseNpgsql(
+                connectionString: builder.Configuration.GetConnectionString(
+                    name: "DefaultConnection"
+                )
+            )
+        );
 
-        builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
+        builder.Services.AddDefaultIdentity<User>(
+            configureOptions: options => options.SignIn.RequireConfirmedAccount = true
+        ).AddEntityFrameworkStores<ApplicationDbContext>();
 
         builder.Services.AddControllersWithViews();
 
-        builder.Services.AddSingleton(new CastleClient(new CastleConfiguration(builder.Configuration["Castle:ApiSecret"])));
+        builder.Services.AddSingleton(
+            implementationInstance: new CastleClient(
+                configuration: new CastleConfiguration(
+                    apiSecret: builder.Configuration[key: "Castle:ApiSecret"]
+                )
+            )
+        );
 
-        builder.Services.AddSingleton(new Cloudflare(builder.Configuration["Cloudflare:Email"], builder.Configuration["Cloudflare:Key"]));
+        builder.Services.AddSingleton(
+            implementationInstance: new Cloudflare(
+                email: builder.Configuration[key: "Cloudflare:Email"],
+                apiKey: builder.Configuration[key: "Cloudflare:Key"]
+            )
+        );
 
         var app = builder.Build();
 
         if (!app.Environment.IsDevelopment())
         {
-            app.UseExceptionHandler("/Home/Error");
+            app.UseExceptionHandler(
+                errorHandlingPath: "/Home/Error"
+            );
             app.UseHsts();
         }
 
@@ -37,7 +62,8 @@ internal class Program
 
         app.MapControllerRoute(
             name: "default",
-            pattern: "{controller=Home}/{action=Index}/{id?}");
+            pattern: "{controller=Home}/{action=Index}/{id?}"
+        );
 
         app.Run();
     }

@@ -1,10 +1,8 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
-namespace MicropostsApp.Models
+namespace MicropostsApp.Models;
+
+public class User : IdentityUser
 {
-    public class User : IdentityUser
-    {
-        // Other properties...
-    }
+    // Other properties...
 }

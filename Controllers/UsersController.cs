@@ -1,51 +1,68 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using MicropostsApp.Data;
 using MicropostsApp.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
-namespace MicropostsApp.Controllers
+namespace MicropostsApp.Controllers;
+
+public class UsersController : Controller
 {
-    public class UsersController : Controller
+    private readonly ApplicationDbContext _context;
+    private readonly UserManager<User> _userManager;
+
+    public UsersController(
+        ApplicationDbContext context,
+        UserManager<User> userManager
+    )
     {
-        private readonly ApplicationDbContext _context;
-        private readonly UserManager<User> _userManager;
+        _context = context;
+        _userManager = userManager;
+    }
 
-        public UsersController(ApplicationDbContext context, UserManager<User> userManager)
-        {
-            _context = context;
-            _userManager = userManager;
-        }
+    public IActionResult Create()
+    {
+        return View();
+    }
 
-        public IActionResult Create()
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(
+        RegisterViewModel model
+    )
+    {
+        if (ModelState.IsValid)
         {
-            return View();
-        }
+            var user = new User { UserName = model.Email, Email = model.Email };
+            var result = await _userManager.CreateAsync(
+                user: user,
+                password: model.Password
+            );
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(RegisterViewModel model)
-        {
-            if (ModelState.IsValid)
+            if (result.Succeeded)
             {
-                var user = new User { UserName = model.Email, Email = model.Email };
-                var result = await _userManager.CreateAsync(user, model.Password);
+                var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(
+                    user: user
+                );
+                await _userManager.ConfirmEmailAsync(
+                    user: user,
+                    token: emailConfirmationToken
+                );
 
-                if (result.Succeeded)
-                {
-                    var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    await _userManager.ConfirmEmailAsync(user, emailConfirmationToken);
-
-                    return RedirectToAction("Index", "Home");
-                }
-
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError(string.Empty, error.Description);
-                }
+                return RedirectToAction(
+                    actionName: "Index",
+                    controllerName: "Home"
+                );
             }
-            return View(model);
+
+            foreach (var error in result.Errors)
+                ModelState.AddModelError(
+                    key: string.Empty,
+                    errorMessage: error.Description
+                );
         }
 
+        return View(
+            model: model
+        );
     }
 }

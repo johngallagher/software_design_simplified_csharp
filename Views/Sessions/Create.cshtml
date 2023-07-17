@@ -1,34 +1,35 @@
-@using Microsoft.Extensions.DependencyInjection
+@using MicropostsApp.Extensions
 @model LoginViewModel
 
 <h2>Login</h2>
 
 <form method="post" id="loginForm">
-  <div asp-validation-summary="All" class="text-danger"></div>
-  <div>
-    <label for="Email">Email</label>
-    <input id="Email" name="Email" type="email" />
-  </div>
-  <div>
-    <label for="Password">Password</label>
-    <input id="Password" name="Password" type="password" />
-  </div>
-  <div>
-    <input id="RememberMe" name="RememberMe" type="checkbox" />
-    <label for="RememberMe">Remember me?</label>
-  </div>
-  @if (ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
-  {
-    <input type="hidden" name="castle_request_token" value="@Context.Request.Query["castleToken"]" />
-  }
-  <button type="submit">Log in</button>
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div>
+        <label for="Email">Email</label>
+        <input id="Email" name="Email" type="email" />
+    </div>
+    <div>
+        <label for="Password">Password</label>
+        <input id="Password" name="Password" type="password" />
+    </div>
+    <div>
+        <input id="RememberMe" name="RememberMe" type="checkbox" />
+        <label for="RememberMe">Remember me?</label>
+    </div>
+    @if (ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
+    {
+        <input type="hidden" name="castle_request_token"
+            value="@Context.Request.Query.GetValueOrDefault(key: "castleToken", defaultValue: "test|device:chrome_on_mac|risk:0.0")" />
+    }
+    <button type="submit">Log in</button>
 </form>
 
 <script src="~/lib/@@castleio/castle-js/dist/castle.browser.js"></script>
 
 @if (!ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
 {
-<script>
+    <script>
   Castle.configure({ pk: 'pk_BxFYyLuiXEfpueKQoFzpfLaGN6LHWpS7' });
   var myForm = document.getElementById('loginForm');
 

@@ -1,20 +1,22 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using System.Diagnostics
+@{
+    ViewData[index: "Title"] = "Home Page";
 }
 
 @{
-    System.Diagnostics.Debug.Assert(User.Identity != null, "User.Identity != null");
+    Debug.Assert(
+        condition: User.Identity != null,
+        message: "User.Identity != null");
 }
 @if (User.Identity.IsAuthenticated)
 {
     <div class="text-center">
-    <h1 class="display-4">Your Dashboard</h1>
-</div>
-
+        <h1 class="display-4">Your Dashboard</h1>
+    </div>
 }
 else
 {
     <div class="text-center">
-    <h1 class="display-4">Home Page</h1>
-</div>
+        <h1 class="display-4">Home Page</h1>
+    </div>
 }

@@ -1,53 +1,57 @@
-using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 public class Cloudflare
 {
-  private readonly HttpClient _httpClient;
+    private readonly HttpClient _httpClient;
 
-  public Cloudflare(string email, string apiKey)
-  {
-    _httpClient = new HttpClient
+    public Cloudflare(
+        string email,
+        string apiKey
+    )
     {
-      BaseAddress = new Uri("https://api.cloudflare.com/client/v4/")
-    };
-    _httpClient.DefaultRequestHeaders.Add("X-Auth-Email", email);
-    _httpClient.DefaultRequestHeaders.Add("X-Auth-Key", apiKey);
-  }
+        _httpClient = new HttpClient
+        {
+            BaseAddress = new Uri(
+                uriString: "https://api.cloudflare.com/client/v4/"
+            )
+        };
+        _httpClient.DefaultRequestHeaders.Add(
+            name: "X-Auth-Email",
+            value: email
+        );
+        _httpClient.DefaultRequestHeaders.Add(
+            name: "X-Auth-Key",
+            value: apiKey
+        );
+    }
 
-  public async Task BlockIpAsync(string ipAddress)
-  {
-    var rule = new
+    public async Task PreventIpAddress(
+        string ipAddress,
+        string mode
+    )
     {
-      mode = "block",
-      configuration = new
-      {
-        target = "ip",
-        value = ipAddress
-      },
-      notes = "This rule blocks a specific IP"
-    };
+        var rule = new
+        {
+            mode,
+            configuration = new
+            {
+                target = "ip",
+                value = ipAddress
+            },
+            notes = "This rule blocks a specific IP"
+        };
 
-    var content = new StringContent(JsonConvert.SerializeObject(rule), Encoding.UTF8, "application/json");
-    await _httpClient.PostAsync("accounts/a4bedc9e66fe2e421c76b068531a75a2/firewall/access_rules/rules", content);
-  }
-
-  public async Task ChallengeIpAsync(string ipAddress)
-  {
-    var rule = new
-    {
-      mode = "challenge",
-      configuration = new
-      {
-        target = "ip",
-        value = ipAddress
-      },
-      notes = "This rule challenges a specific IP"
-    };
-
-    var content = new StringContent(JsonConvert.SerializeObject(rule), Encoding.UTF8, "application/json");
-    await _httpClient.PostAsync("accounts/a4bedc9e66fe2e421c76b068531a75a2/firewall/access_rules/rules", content);
-  }
+        var content = new StringContent(
+            content: JsonConvert.SerializeObject(
+                value: rule
+            ),
+            encoding: Encoding.UTF8,
+            mediaType: "application/json"
+        );
+        await _httpClient.PostAsync(
+            requestUri: "accounts/a4bedc9e66fe2e421c76b068531a75a2/firewall/access_rules/rules",
+            content: content
+        );
+    }
 }
