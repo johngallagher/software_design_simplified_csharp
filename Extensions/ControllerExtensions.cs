@@ -39,6 +39,48 @@ public static class ControllerExtensions
         );
         return response.Risk;
     }
+
+    public static async Task ChallengeIpAddress(this Controller controller, Cloudflare cloudflare)
+    {
+        var ipAddress = GetIpAddress(
+            context: controller.Request.HttpContext
+        );
+        await cloudflare.PreventIpAddress(
+            ipAddress: ipAddress,
+            mode: "challenge"
+        );
+    }
+
+    public static async Task BlockIpAddress(this Controller controller, Cloudflare cloudflare)
+    
+    {
+        var ipAddress = GetIpAddress(
+            context: controller.Request.HttpContext
+        );
+        await cloudflare.PreventIpAddress(
+            ipAddress: ipAddress,
+            mode: "block"
+        );
+    }
+
+    private static string GetIpAddress(
+        HttpContext context
+    )
+    {
+        if (context.Request.Headers.TryGetValue(
+                key: "X-Forwarded-For",
+                value: out var forwardedFor
+            ))
+        {
+            var ips = forwardedFor.ToString().Split(
+                separator: ',',
+                options: StringSplitOptions.TrimEntries
+            );
+            return ips[0];
+        }
+
+        return context.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+    }
 }
 
 

@@ -71,7 +71,9 @@ public class UsersController : Controller
 
             if (riskScore >= HighRiskThreshold)
             {
-                await BlockIpAddress();
+                await this.BlockIpAddress(
+                    cloudflare: _cloudflare
+                );
                 Response.StatusCode = 500;
                 return View(
                     viewName: "Error500"
@@ -80,7 +82,9 @@ public class UsersController : Controller
 
             if (riskScore >= MediumRiskThreshold && riskScore < HighRiskThreshold)
             {
-                await ChallengeIpAddress();
+                await this.ChallengeIpAddress(
+                    cloudflare: _cloudflare
+                );
             }
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(
@@ -140,46 +144,5 @@ public class UsersController : Controller
                     }
                 }
             );
-    }
-
-    private async Task ChallengeIpAddress()
-    {
-        var ipAddress = GetIpAddress(
-            context: Request.HttpContext
-        );
-        await _cloudflare.PreventIpAddress(
-            ipAddress: ipAddress,
-            mode: "challenge"
-        );
-    }
-
-    private async Task BlockIpAddress()
-    {
-        var ipAddress = GetIpAddress(
-            context: Request.HttpContext
-        );
-        await _cloudflare.PreventIpAddress(
-            ipAddress: ipAddress,
-            mode: "block"
-        );
-    }
-
-    private string GetIpAddress(
-        HttpContext context
-    )
-    {
-        if (context.Request.Headers.TryGetValue(
-                key: "X-Forwarded-For",
-                value: out var forwardedFor
-            ))
-        {
-            var ips = forwardedFor.ToString().Split(
-                separator: ',',
-                options: StringSplitOptions.TrimEntries
-            );
-            return ips[0];
-        }
-
-        return context.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
     }
 }

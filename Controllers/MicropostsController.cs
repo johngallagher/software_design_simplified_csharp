@@ -66,10 +66,9 @@ public class MicropostsController : Controller
             user: await _userManager.GetUserAsync(principal: User),
             name: "Created a micropost"
         );
-
         if (riskScore >= HighRiskThreshold)
         {
-            await BlockIpAddress();
+            await this.BlockIpAddress(cloudflare: _cloudflare);
             Response.StatusCode = 500;
             return View(
                 viewName: "Error500"
@@ -78,7 +77,7 @@ public class MicropostsController : Controller
 
         if (riskScore >= MediumRiskThreshold && riskScore < HighRiskThreshold)
         {
-            await ChallengeIpAddress();
+            await this.ChallengeIpAddress(cloudflare: _cloudflare);
         }
 
         _context.Add(
@@ -92,46 +91,5 @@ public class MicropostsController : Controller
             actionName: "Index",
             controllerName: "Microposts"
         );
-    }
-
-    private async Task ChallengeIpAddress()
-    {
-        var ipAddress = GetIpAddress(
-            context: Request.HttpContext
-        );
-        await _cloudflare.PreventIpAddress(
-            ipAddress: ipAddress,
-            mode: "challenge"
-        );
-    }
-
-    private async Task BlockIpAddress()
-    {
-        var ipAddress = GetIpAddress(
-            context: Request.HttpContext
-        );
-        await _cloudflare.PreventIpAddress(
-            ipAddress: ipAddress,
-            mode: "block"
-        );
-    }
-
-    public string GetIpAddress(
-        HttpContext context
-    )
-    {
-        if (context.Request.Headers.TryGetValue(
-                key: "X-Forwarded-For",
-                value: out var forwardedFor
-            ))
-        {
-            var ips = forwardedFor.ToString().Split(
-                separator: ',',
-                options: StringSplitOptions.TrimEntries
-            );
-            return ips[0];
-        }
-
-        return context.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
     }
 }
