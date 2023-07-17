@@ -31,9 +31,7 @@ public class Cloudflare
     };
 
     var content = new StringContent(JsonConvert.SerializeObject(rule), Encoding.UTF8, "application/json");
-    var response = await _httpClient.PostAsync("accounts/a4bedc9e66fe2e421c76b068531a75a2/firewall/access_rules/rules", content);
-
-    response.EnsureSuccessStatusCode();
+    await _httpClient.PostAsync("accounts/a4bedc9e66fe2e421c76b068531a75a2/firewall/access_rules/rules", content);
   }
 
   public async Task ChallengeIpAsync(string ipAddress)

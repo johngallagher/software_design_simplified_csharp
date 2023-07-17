@@ -1,11 +1,8 @@
 using Castle;
 using Castle.Messages.Requests;
-using Castle.Infrastructure.Exceptions;
-using Castle.Messages.Responses;
+using MicropostsApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using MicropostsApp.Data;
 
 namespace MicropostsApp.Controllers
 {
@@ -13,13 +10,12 @@ namespace MicropostsApp.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly ApplicationDbContext _context;
         private readonly CastleClient _castleClient;
         private readonly Cloudflare _cloudflare;
 
-        public SessionsController(ApplicationDbContext context, UserManager<User> userManager, SignInManager<User> signInManager, CastleClient castleClient, Cloudflare cloudflare)
+        public SessionsController(UserManager<User> userManager,
+            SignInManager<User> signInManager, CastleClient castleClient, Cloudflare cloudflare)
         {
-            _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _castleClient = castleClient;
@@ -34,39 +30,58 @@ namespace MicropostsApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(LoginViewModel model)
         {
-
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
-            
-            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: false, lockoutOnFailure: false);
+
+            await NotifyFraudDetectionSystemOf(type: "$registration", status: "$attempted", model: model);
+
+            var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: false,
+                lockoutOnFailure: false);
             if (result.Succeeded)
             {
-                var hackerLikelihood = await FetchHackerLikelihood(model);
+                var hackerLikelihood = await FetchHackerLikelihood(type: "$registration", status: "$succeeded", model);
 
                 if (hackerLikelihood <= 0.6)
                 {
                     return RedirectToAction("Index", "Home");
                 }
-                else if (hackerLikelihood > 0.6 && hackerLikelihood < 0.9)
+
+                if (hackerLikelihood > 0.6 && hackerLikelihood < 0.9)
                 {
                     await ChallengeIpAddress();
                     return RedirectToAction("Index", "Home");
                 }
-                else
-                {
-                    await BlockIpAddress();
-                    Response.StatusCode = 500;
-                    return View("Error500");
-                }
+
+                await BlockIpAddress();
+                Response.StatusCode = 500;
+                return View("Error500");
             }
             else
             {
-
                 ModelState.AddModelError(string.Empty, result.ToString());
                 return View(model);
             }
+        }
+
+        private async Task NotifyFraudDetectionSystemOf(string type, string status, LoginViewModel model)
+        {
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user != null)
+                await _castleClient.Filter(new ActionRequest()
+                {
+                    Type = type,
+                    Status = status,
+                    RequestToken = model.castle_request_token,
+                    Context = Castle.Context.FromHttpRequest(Request),
+                    User = new Dictionary<string, object>()
+                    {
+                        { "id", user.Id },
+                        { "email", user.Email },
+                    }
+                });
         }
 
         private async Task ChallengeIpAddress()
@@ -81,13 +96,14 @@ namespace MicropostsApp.Controllers
             await _cloudflare.BlockIpAsync(ipAddress);
         }
 
-        private async Task<float> FetchHackerLikelihood(LoginViewModel model)
+        private async Task<float> FetchHackerLikelihood(string type, string status, LoginViewModel model)
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null) return 0;
             var res = await _castleClient.Risk(new ActionRequest()
             {
-                Type = "$login",
-                Status = "$succeeded",
+                Type = type,
+                Status = status,
                 RequestToken = model.castle_request_token,
                 Context = Castle.Context.FromHttpRequest(Request),
                 User = new Dictionary<string, object>()
@@ -107,9 +123,7 @@ namespace MicropostsApp.Controllers
                 return ips[0];
             }
 
-            return context.Connection.RemoteIpAddress.ToString();
+            return context.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
         }
-
     }
 }
-
