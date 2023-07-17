@@ -42,7 +42,7 @@ public class SessionsController : Controller
             );
 
         await NotifyFraudDetectionSystemOf(
-            type: "$registration",
+            type: "$login",
             status: "$attempted",
             model: model
         );
@@ -56,7 +56,7 @@ public class SessionsController : Controller
         if (result.Succeeded)
         {
             var hackerLikelihood = await FetchHackerLikelihood(
-                type: "$registration",
+                type: "$login",
                 status: "$succeeded",
                 model: model
             );
