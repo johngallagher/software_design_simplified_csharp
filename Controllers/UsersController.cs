@@ -63,10 +63,10 @@ public class UsersController : Controller
         {
             var riskScore = await this.FetchRiskScore(
                 type: "$registration",
-                status: "$succeeded",
                 model: model,
                 castleClient: _castleClient,
-                user: user
+                user: user,
+                status: "$succeeded"
             );
 
             if (riskScore >= HighRiskThreshold)

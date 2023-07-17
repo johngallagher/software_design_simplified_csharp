@@ -12,10 +12,11 @@ public static class ControllerExtensions
     public static async Task<float> FetchRiskScore(
         this Controller controller,
         string type,
-        string status,
         IProtectable model,
         CastleClient castleClient,
-        User? user
+        User? user,
+        string? name = null,
+        string? status = null
     )
     {
         if (user == null) return 0;
@@ -24,6 +25,7 @@ public static class ControllerExtensions
             {
                 Type = type,
                 Status = status,
+                Name = name,
                 RequestToken = model.castle_request_token,
                 Context = Context.FromHttpRequest(
                     request: controller.Request

@@ -61,12 +61,12 @@ public class SessionsController : Controller
         {
             var riskScore = await this.FetchRiskScore(
                 type: "$login",
-                status: "$succeeded",
                 model: model,
                 castleClient: _castleClient,
                 user: await _userManager.FindByEmailAsync(
                     email: model.Email
-                )
+                ),
+                status: "$succeeded"
             );
 
             if (riskScore >= HighRiskThreshold)

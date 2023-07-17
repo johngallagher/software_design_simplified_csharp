@@ -1,5 +1,5 @@
 using Castle;
-using Castle.Messages.Requests;
+using MicropostsApp.Extensions;
 using MicropostsApp.Data;
 using MicropostsApp.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -59,10 +59,12 @@ public class MicropostsController : Controller
                 model: model
             );
 
-        var riskScore = await FetchRiskScore(
+        var riskScore = await this.FetchRiskScore(
             type: "$custom",
-            name: "Created a micropost",
-            model: model
+            model: model,
+            castleClient: _castleClient,
+            user: await _userManager.GetUserAsync(principal: User),
+            name: "Created a micropost"
         );
 
         if (riskScore >= HighRiskThreshold)
@@ -90,36 +92,6 @@ public class MicropostsController : Controller
             actionName: "Index",
             controllerName: "Microposts"
         );
-    }
-
-    private async Task<float> FetchRiskScore(
-        string type,
-        string name,
-        MicropostViewModel model
-    )
-    {
-        var user = await _userManager.GetUserAsync(
-            User
-        );
-
-        if (user == null) return 0;
-        var response = await _castleClient.Risk(
-            request: new ActionRequest
-            {
-                Type = type,
-                Name = name,
-                RequestToken = model.castle_request_token,
-                Context = Context.FromHttpRequest(
-                    request: Request
-                ),
-                User = new Dictionary<string, object>
-                {
-                    { "id", user.Id },
-                    { "email", user.Email ?? string.Empty }
-                }
-            }
-        );
-        return response.Risk;
     }
 
     private async Task ChallengeIpAddress()
