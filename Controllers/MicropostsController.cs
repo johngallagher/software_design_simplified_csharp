@@ -61,34 +61,31 @@ public class MicropostsController : Controller
             name: "Created a micropost",
             model: model
         );
-        if (hackerLikelihood <= 0.6)
+
+        if (hackerLikelihood >= 0.8)
         {
-            _context.Add(
-                entity: new Micropost()
-                {
-                    Content = model.Content
-                }
-            );
-            await _context.SaveChangesAsync();
-            return RedirectToAction(
-                actionName: "Index",
-                controllerName: "Microposts"
+            await BlockIpAddress();
+            Response.StatusCode = 500;
+            return View(
+                viewName: "Error500"
             );
         }
 
-        if (hackerLikelihood > 0.6 && hackerLikelihood < 0.9)
+        if (hackerLikelihood >= 0.6 && hackerLikelihood < 0.8)
         {
             await ChallengeIpAddress();
-            return RedirectToAction(
-                actionName: "Index",
-                controllerName: "Microposts"
-            );
         }
 
-        await BlockIpAddress();
-        Response.StatusCode = 500;
-        return View(
-            viewName: "Error500"
+        _context.Add(
+            entity: new Micropost()
+            {
+                Content = model.Content
+            }
+        );
+        await _context.SaveChangesAsync();
+        return RedirectToAction(
+            actionName: "Index",
+            controllerName: "Microposts"
         );
     }
 

@@ -63,35 +63,30 @@ public class UsersController : Controller
                 model: model
             );
 
-            if (hackerLikelihood <= 0.6)
+            if (hackerLikelihood >= 0.8)
             {
-                var emailConfirmationToken = await _userManager.GenerateEmailConfirmationTokenAsync(
-                    user: user
-                );
-                await _userManager.ConfirmEmailAsync(
-                    user: user,
-                    token: emailConfirmationToken
-                );
-
-                return RedirectToAction(
-                    actionName: "Create",
-                    controllerName: "Sessions"
+                await BlockIpAddress();
+                Response.StatusCode = 500;
+                return View(
+                    viewName: "Error500"
                 );
             }
 
-            if (hackerLikelihood > 0.6 && hackerLikelihood < 0.9)
+            if (hackerLikelihood >= 0.6 && hackerLikelihood < 0.8)
             {
                 await ChallengeIpAddress();
-                return RedirectToAction(
-                    actionName: "Create",
-                    controllerName: "Sessions"
-                );
             }
 
-            await BlockIpAddress();
-            Response.StatusCode = 500;
-            return View(
-                viewName: "Error500"
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(
+                user: user
+            );
+            await _userManager.ConfirmEmailAsync(
+                user: user,
+                token: token
+            );
+            return RedirectToAction(
+                actionName: "Create",
+                controllerName: "Sessions"
             );
         }
         else
@@ -193,6 +188,7 @@ public class UsersController : Controller
             mode: "block"
         );
     }
+
     public string GetIpAddress(
         HttpContext context
     )

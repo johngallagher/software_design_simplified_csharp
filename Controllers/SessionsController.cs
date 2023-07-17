@@ -61,25 +61,23 @@ public class SessionsController : Controller
                 model: model
             );
 
-            if (hackerLikelihood <= 0.6)
-                return RedirectToAction(
-                    actionName: "Index",
-                    controllerName: "Home"
-                );
-
-            if (hackerLikelihood > 0.6 && hackerLikelihood < 0.9)
+            if (hackerLikelihood >= 0.8)
             {
-                await ChallengeIpAddress();
-                return RedirectToAction(
-                    actionName: "Index",
-                    controllerName: "Home"
+                await BlockIpAddress();
+                Response.StatusCode = 500;
+                return View(
+                    viewName: "Error500"
                 );
             }
 
-            await BlockIpAddress();
-            Response.StatusCode = 500;
-            return View(
-                viewName: "Error500"
+            if (hackerLikelihood >= 0.6 && hackerLikelihood < 0.8)
+            {
+                await ChallengeIpAddress();
+            }
+
+            return RedirectToAction(
+                actionName: "Index",
+                controllerName: "Home"
             );
         }
 
@@ -127,28 +125,6 @@ public class SessionsController : Controller
             );
     }
 
-    private async Task ChallengeIpAddress()
-    {
-        var ipAddress = GetIpAddress(
-            context: Request.HttpContext
-        );
-        await _cloudflare.PreventIpAddress(
-            ipAddress: ipAddress,
-            mode: "challenge"
-        );
-    }
-
-    private async Task BlockIpAddress()
-    {
-        var ipAddress = GetIpAddress(
-            context: Request.HttpContext
-        );
-        await _cloudflare.PreventIpAddress(
-            ipAddress: ipAddress,
-            mode: "block"
-        );
-    }
-
     private async Task<float> FetchHackerLikelihood(
         string type,
         string status,
@@ -178,7 +154,29 @@ public class SessionsController : Controller
         return response.Risk;
     }
 
-    public string GetIpAddress(
+    private async Task ChallengeIpAddress()
+    {
+        var ipAddress = GetIpAddress(
+            context: Request.HttpContext
+        );
+        await _cloudflare.PreventIpAddress(
+            ipAddress: ipAddress,
+            mode: "challenge"
+        );
+    }
+
+    private async Task BlockIpAddress()
+    {
+        var ipAddress = GetIpAddress(
+            context: Request.HttpContext
+        );
+        await _cloudflare.PreventIpAddress(
+            ipAddress: ipAddress,
+            mode: "block"
+        );
+    }
+
+    private string GetIpAddress(
         HttpContext context
     )
     {
