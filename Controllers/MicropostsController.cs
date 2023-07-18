@@ -65,7 +65,7 @@ public class MicropostsController : Controller
             user: await _userManager.GetUserAsync(
                 principal: User
             ),
-            castleRequestToken: model.castle_request_token
+            castleRequestToken: model.CastleRequestToken
         );
         if (riskScore >= HighRiskThreshold)
         {

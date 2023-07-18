@@ -37,5 +37,5 @@ public class RegisterViewModel
     )]
     public string ConfirmPassword { get; set; }
 
-    public string castle_request_token { get; set; }
+    [Required] public string CastleRequestToken { get; set; }
 }

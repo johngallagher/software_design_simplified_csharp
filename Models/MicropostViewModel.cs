@@ -8,5 +8,5 @@ public class MicropostViewModel
 
     [Required] public string Content { get; set; }
 
-    [Required] public string castle_request_token { get; set; }
+    [Required] public string CastleRequestToken { get; set; }
 }

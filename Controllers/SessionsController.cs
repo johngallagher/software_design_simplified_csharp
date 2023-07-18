@@ -48,7 +48,7 @@ public class SessionsController : Controller
             status: "$attempted",
             userEmail: model.Email,
             castleClient: _castleClient,
-            castleRequestToken: model.castle_request_token
+            castleRequestToken: model.CastleRequestToken
         );
         var result = await _signInManager.PasswordSignInAsync(
             userName: model.Email,
@@ -65,7 +65,7 @@ public class SessionsController : Controller
                 user: await _userManager.FindByEmailAsync(
                     email: model.Email
                 ),
-                castleRequestToken: model.castle_request_token
+                castleRequestToken: model.CastleRequestToken
             );
 
             if (riskScore >= HighRiskThreshold)
@@ -95,7 +95,7 @@ public class SessionsController : Controller
             status: "$failed",
             userEmail: model.Email,
             castleClient: _castleClient,
-            castleRequestToken: model.castle_request_token
+            castleRequestToken: model.CastleRequestToken
         );
 
         ModelState.AddModelError(

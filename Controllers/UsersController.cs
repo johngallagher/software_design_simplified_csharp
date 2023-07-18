@@ -51,7 +51,7 @@ public class UsersController : Controller
             status: "$attempted",
             userEmail: model.Email,
             castleClient: _castleClient,
-            castleRequestToken: model.castle_request_token
+            castleRequestToken: model.CastleRequestToken
         );
         var result = await _userManager.CreateAsync(
             user: user,
@@ -64,7 +64,7 @@ public class UsersController : Controller
                 status: "$succeeded",
                 castleClient: _castleClient,
                 user: user,
-                castleRequestToken: model.castle_request_token
+                castleRequestToken: model.CastleRequestToken
             );
 
             if (riskScore >= HighRiskThreshold)
@@ -101,7 +101,7 @@ public class UsersController : Controller
             status: "$failed",
             userEmail: model.Email,
             castleClient: _castleClient,
-            castleRequestToken: model.castle_request_token
+            castleRequestToken: model.CastleRequestToken
         );
 
         foreach (var error in result.Errors)

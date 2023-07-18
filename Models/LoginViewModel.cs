@@ -17,5 +17,5 @@ public class LoginViewModel
     )]
     public bool RememberMe { get; set; }
 
-    [Required] public string castle_request_token { get; set; }
+    [Required] public string CastleRequestToken { get; set; }
 }
