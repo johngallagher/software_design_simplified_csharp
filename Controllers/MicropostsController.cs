@@ -66,9 +66,7 @@ public class MicropostsController : Controller
         );
         if (riskScore.Deny())
         {
-            await _cloudflare.Block(
-                context: Request.HttpContext
-            );
+            await _cloudflare.Block(context: Request.HttpContext);
             Response.StatusCode = 500;
             return View(viewName: "Error500");
         }
