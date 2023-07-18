@@ -1,6 +1,5 @@
 using Castle;
 using Castle.Messages.Requests;
-using MicropostsApp.Interfaces;
 using MicropostsApp.Models;
 using Microsoft.AspNetCore.Mvc;
 

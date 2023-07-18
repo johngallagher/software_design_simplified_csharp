@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using MicropostsApp.Interfaces;
 
 namespace MicropostsApp.Models;
 
-public class LoginViewModel : IViewModel
+public class LoginViewModel
 {
     [Required] [EmailAddress] public string Email { get; set; }
 
