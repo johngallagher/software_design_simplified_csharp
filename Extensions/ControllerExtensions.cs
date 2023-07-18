@@ -7,7 +7,7 @@ namespace MicropostsApp.Extensions;
 
 public static class ControllerExtensions
 {
-    public static async Task<float> FetchRiskScore(
+    public static async Task<RiskScore> FetchRiskScore(
         this Controller controller,
         CastleClient castleClient,
         User? user,
@@ -17,7 +17,7 @@ public static class ControllerExtensions
         string? status = null
     )
     {
-        if (user == null) return 0;
+        if (user == null) return new RiskScore { Score = 0 };
         var response = await castleClient.Risk(
             request: new ActionRequest
             {
@@ -35,7 +35,7 @@ public static class ControllerExtensions
                 }
             }
         );
-        return response.Risk;
+        return new RiskScore { Score = response.Risk };
     }
 
     public static async Task NotifyFraudDetectionSystemOf(

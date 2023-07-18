@@ -1,5 +1,4 @@
 using Castle;
-using MicropostsApp.Constants;
 using MicropostsApp.Data;
 using MicropostsApp.Extensions;
 using MicropostsApp.Models;
@@ -64,7 +63,7 @@ public class UsersController : Controller
                 castleRequestToken: model.CastleRequestToken
             );
 
-            if (riskScore >= RiskThresholds.High)
+            if (riskScore.Deny())
             {
                 await _cloudflare.Block(
                     context: Request.HttpContext
@@ -75,7 +74,7 @@ public class UsersController : Controller
                 );
             }
 
-            if (riskScore >= RiskThresholds.Medium && riskScore < RiskThresholds.High)
+            if (riskScore.Challenge())
                 await _cloudflare.Challenge(
                     context: Request.HttpContext
                 );

@@ -1,5 +1,4 @@
 using Castle;
-using MicropostsApp.Constants;
 using MicropostsApp.Data;
 using MicropostsApp.Extensions;
 using MicropostsApp.Models;
@@ -57,7 +56,7 @@ public class MicropostsController : Controller
             return View(
                 model: model
             );
-
+        
         var riskScore = await this.FetchRiskScore(
             type: "$custom",
             name: "Created a micropost",
@@ -65,9 +64,9 @@ public class MicropostsController : Controller
             user: await _userManager.GetUserAsync(
                 principal: User
             ),
-                castleRequestToken: model.CastleRequestToken
+            castleRequestToken: model.CastleRequestToken
         );
-        if (riskScore >= RiskThresholds.High)
+        if (riskScore.Deny())
         {
             await _cloudflare.Block(
                 context: Request.HttpContext
@@ -78,7 +77,7 @@ public class MicropostsController : Controller
             );
         }
 
-        if (riskScore >= RiskThresholds.Medium && riskScore < RiskThresholds.High)
+        if (riskScore.Challenge())
             await _cloudflare.Challenge(
                 context: Request.HttpContext
             );
