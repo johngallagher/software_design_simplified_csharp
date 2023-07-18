@@ -1,4 +1,4 @@
-namespace MicropostsApp.Models;
+namespace MicropostsApp.Interfaces;
 
 public interface IProtectable
 {

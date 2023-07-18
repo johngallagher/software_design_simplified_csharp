@@ -1,3 +1,5 @@
+using MicropostsApp.Interfaces;
+
 namespace MicropostsApp.Models;
 
 public class RiskScore : IProtectable
