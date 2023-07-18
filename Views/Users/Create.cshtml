@@ -24,7 +24,7 @@
     @if (ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
     {
         <input type="hidden" name="CastleRequestToken"
-               value="@Context.Request.Query.GetValueOrDefault(key: "castleToken", defaultValue: "test|device:chrome_on_mac|risk:0.0")"/>
+               value="@Context.Request.Query.GetValueOrDefault(key: "castleToken", defaultValue: "test|device:chrome_on_mac|risk:0.0|policy.action:allow")"/>
     }
     <button type="submit" class="btn btn-primary">Register</button>
 </form>
