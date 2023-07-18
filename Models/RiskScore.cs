@@ -1,6 +1,6 @@
 namespace MicropostsApp.Models;
 
-public class RiskScore
+public class RiskScore : IProtectable
 {
     public RiskScore(
         float score
