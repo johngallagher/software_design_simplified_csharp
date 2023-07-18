@@ -1,6 +1,6 @@
 using Castle;
-using MicropostsApp.Extensions;
 using MicropostsApp.Data;
+using MicropostsApp.Extensions;
 using MicropostsApp.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +9,12 @@ namespace MicropostsApp.Controllers;
 
 public class UsersController : Controller
 {
-    private readonly ApplicationDbContext _context;
-    private readonly UserManager<User> _userManager;
+    private const float HighRiskThreshold = 0.8f;
+    private const float MediumRiskThreshold = 0.6f;
     private readonly CastleClient _castleClient;
     private readonly Cloudflare _cloudflare;
+    private readonly ApplicationDbContext _context;
+    private readonly UserManager<User> _userManager;
 
     public UsersController(
         ApplicationDbContext context,
@@ -31,9 +33,6 @@ public class UsersController : Controller
     {
         return View();
     }
-
-    private const float HighRiskThreshold = 0.8f;
-    private const float MediumRiskThreshold = 0.6f;
 
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -62,10 +61,10 @@ public class UsersController : Controller
         {
             var riskScore = await this.FetchRiskScore(
                 type: "$registration",
-                model: model,
+                status: "$succeeded",
                 castleClient: _castleClient,
                 user: user,
-                status: "$succeeded"
+                castleRequestToken: model.castle_request_token
             );
 
             if (riskScore >= HighRiskThreshold)
@@ -80,11 +79,9 @@ public class UsersController : Controller
             }
 
             if (riskScore >= MediumRiskThreshold && riskScore < HighRiskThreshold)
-            {
                 await this.ChallengeIpAddress(
                     cloudflare: _cloudflare
                 );
-            }
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(
                 user: user

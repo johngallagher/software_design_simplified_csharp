@@ -3,7 +3,7 @@ using MicropostsApp.Interfaces;
 
 namespace MicropostsApp.Models;
 
-public class MicropostViewModel : IProtectable
+public class MicropostViewModel
 {
     public int Id { get; set; }
 

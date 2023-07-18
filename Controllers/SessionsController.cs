@@ -8,6 +8,8 @@ namespace MicropostsApp.Controllers;
 
 public class SessionsController : Controller
 {
+    private const float HighRiskThreshold = 0.8f;
+    private const float MediumRiskThreshold = 0.6f;
     private readonly CastleClient _castleClient;
     private readonly Cloudflare _cloudflare;
     private readonly SignInManager<User> _signInManager;
@@ -30,9 +32,6 @@ public class SessionsController : Controller
     {
         return View();
     }
-
-    private const float HighRiskThreshold = 0.8f;
-    private const float MediumRiskThreshold = 0.6f;
 
     [HttpPost]
     public async Task<IActionResult> Create(
@@ -61,12 +60,12 @@ public class SessionsController : Controller
         {
             var riskScore = await this.FetchRiskScore(
                 type: "$login",
-                model: model,
+                status: "$succeeded",
                 castleClient: _castleClient,
                 user: await _userManager.FindByEmailAsync(
                     email: model.Email
                 ),
-                status: "$succeeded"
+                castleRequestToken: model.castle_request_token
             );
 
             if (riskScore >= HighRiskThreshold)
@@ -81,11 +80,9 @@ public class SessionsController : Controller
             }
 
             if (riskScore >= MediumRiskThreshold && riskScore < HighRiskThreshold)
-            {
                 await this.ChallengeIpAddress(
                     cloudflare: _cloudflare
                 );
-            }
 
             return RedirectToAction(
                 actionName: "Index",

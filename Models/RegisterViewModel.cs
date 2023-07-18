@@ -3,7 +3,7 @@ using MicropostsApp.Interfaces;
 
 namespace MicropostsApp.Models;
 
-public class RegisterViewModel : IProtectable
+public class RegisterViewModel : IViewModel
 {
     [Required]
     [EmailAddress]

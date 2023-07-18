@@ -1,6 +1,6 @@
 using Castle;
-using MicropostsApp.Extensions;
 using MicropostsApp.Data;
+using MicropostsApp.Extensions;
 using MicropostsApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -12,10 +12,12 @@ namespace MicropostsApp.Controllers;
 [Authorize]
 public class MicropostsController : Controller
 {
-    private readonly ApplicationDbContext _context;
-    private readonly UserManager<User> _userManager;
+    private const float HighRiskThreshold = 0.8f;
+    private const float MediumRiskThreshold = 0.6f;
     private readonly CastleClient _castleClient;
     private readonly Cloudflare _cloudflare;
+    private readonly ApplicationDbContext _context;
+    private readonly UserManager<User> _userManager;
 
     public MicropostsController(
         ApplicationDbContext context,
@@ -44,9 +46,6 @@ public class MicropostsController : Controller
         return View();
     }
 
-    private const float HighRiskThreshold = 0.8f;
-    private const float MediumRiskThreshold = 0.6f;
-
     // POST: Microposts/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -61,12 +60,12 @@ public class MicropostsController : Controller
 
         var riskScore = await this.FetchRiskScore(
             type: "$custom",
-            model: model,
+            name: "Created a micropost",
             castleClient: _castleClient,
             user: await _userManager.GetUserAsync(
                 principal: User
             ),
-            name: "Created a micropost"
+            castleRequestToken: model.castle_request_token
         );
         if (riskScore >= HighRiskThreshold)
         {
@@ -80,14 +79,12 @@ public class MicropostsController : Controller
         }
 
         if (riskScore >= MediumRiskThreshold && riskScore < HighRiskThreshold)
-        {
             await this.ChallengeIpAddress(
                 cloudflare: _cloudflare
             );
-        }
 
         _context.Add(
-            entity: new Micropost()
+            entity: new Micropost
             {
                 Content = model.Content
             }

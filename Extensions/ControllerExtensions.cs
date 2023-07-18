@@ -2,7 +2,6 @@ using Castle;
 using Castle.Messages.Requests;
 using MicropostsApp.Interfaces;
 using MicropostsApp.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MicropostsApp.Extensions;
@@ -11,10 +10,10 @@ public static class ControllerExtensions
 {
     public static async Task<float> FetchRiskScore(
         this Controller controller,
-        string type,
-        IProtectable model,
         CastleClient castleClient,
         User? user,
+        string castleRequestToken,
+        string type,
         string? name = null,
         string? status = null
     )
@@ -26,7 +25,7 @@ public static class ControllerExtensions
                 Type = type,
                 Status = status,
                 Name = name,
-                RequestToken = model.castle_request_token,
+                RequestToken = castleRequestToken,
                 Context = Context.FromHttpRequest(
                     request: controller.Request
                 ),
