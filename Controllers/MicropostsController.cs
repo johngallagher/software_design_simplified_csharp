@@ -63,12 +63,16 @@ public class MicropostsController : Controller
             type: "$custom",
             model: model,
             castleClient: _castleClient,
-            user: await _userManager.GetUserAsync(principal: User),
+            user: await _userManager.GetUserAsync(
+                principal: User
+            ),
             name: "Created a micropost"
         );
         if (riskScore >= HighRiskThreshold)
         {
-            await this.BlockIpAddress(cloudflare: _cloudflare);
+            await this.BlockIpAddress(
+                cloudflare: _cloudflare
+            );
             Response.StatusCode = 500;
             return View(
                 viewName: "Error500"
@@ -77,7 +81,9 @@ public class MicropostsController : Controller
 
         if (riskScore >= MediumRiskThreshold && riskScore < HighRiskThreshold)
         {
-            await this.ChallengeIpAddress(cloudflare: _cloudflare);
+            await this.ChallengeIpAddress(
+                cloudflare: _cloudflare
+            );
         }
 
         _context.Add(
