@@ -17,7 +17,9 @@ public static class ControllerExtensions
         string? status = null
     )
     {
-        if (user == null) return new RiskScore { Score = 0 };
+        if (user == null)
+            return new RiskScore(score: 0);
+
         var response = await castleClient.Risk(
             request: new ActionRequest
             {
@@ -35,7 +37,7 @@ public static class ControllerExtensions
                 }
             }
         );
-        return new RiskScore { Score = response.Risk };
+        return new RiskScore(score: response.Risk);
     }
 
     public static async Task NotifyFraudDetectionSystemOf(

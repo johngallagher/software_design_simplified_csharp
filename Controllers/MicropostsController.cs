@@ -53,10 +53,8 @@ public class MicropostsController : Controller
     )
     {
         if (!ModelState.IsValid)
-            return View(
-                model: model
-            );
-        
+            return View(model: model);
+
         var riskScore = await this.FetchRiskScore(
             type: "$custom",
             name: "Created a micropost",
@@ -72,15 +70,11 @@ public class MicropostsController : Controller
                 context: Request.HttpContext
             );
             Response.StatusCode = 500;
-            return View(
-                viewName: "Error500"
-            );
+            return View(viewName: "Error500");
         }
 
         if (riskScore.Challenge())
-            await _cloudflare.Challenge(
-                context: Request.HttpContext
-            );
+            await _cloudflare.Challenge(context: Request.HttpContext);
 
         _context.Add(
             entity: new Micropost
@@ -89,9 +83,6 @@ public class MicropostsController : Controller
             }
         );
         await _context.SaveChangesAsync();
-        return RedirectToAction(
-            actionName: "Index",
-            controllerName: "Microposts"
-        );
+        return RedirectToAction(actionName: "Index", controllerName: "Microposts");
     }
 }

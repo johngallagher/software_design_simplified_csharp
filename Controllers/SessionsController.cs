@@ -61,32 +61,21 @@ public class SessionsController : Controller
                 type: "$login",
                 status: "$succeeded",
                 castleClient: _castleClient,
-                user: await _userManager.FindByEmailAsync(
-                    email: model.Email
-                ),
+                user: await _userManager.FindByEmailAsync(email: model.Email),
                 castleRequestToken: model.CastleRequestToken
             );
 
             if (riskScore.Deny())
             {
-                await _cloudflare.Block(
-                    context: Request.HttpContext
-                );
+                await _cloudflare.Block(context: Request.HttpContext);
                 Response.StatusCode = 500;
-                return View(
-                    viewName: "Error500"
-                );
+                return View(viewName: "Error500");
             }
 
             if (riskScore.Challenge())
-                await _cloudflare.Challenge(
-                    context: Request.HttpContext
-                );
+                await _cloudflare.Challenge(context: Request.HttpContext);
 
-            return RedirectToAction(
-                actionName: "Index",
-                controllerName: "Home"
-            );
+            return RedirectToAction(actionName: "Index", controllerName: "Home");
         }
 
         await this.NotifyFraudDetectionSystemOf(

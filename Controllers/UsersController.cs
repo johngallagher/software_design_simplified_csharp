@@ -37,9 +37,7 @@ public class UsersController : Controller
     )
     {
         if (!ModelState.IsValid)
-            return View(
-                model: model
-            );
+            return View(model: model);
 
         var user = new User { UserName = model.Email, Email = model.Email };
         await this.NotifyFraudDetectionSystemOf(
@@ -69,27 +67,15 @@ public class UsersController : Controller
                     context: Request.HttpContext
                 );
                 Response.StatusCode = 500;
-                return View(
-                    viewName: "Error500"
-                );
+                return View(viewName: "Error500");
             }
 
             if (riskScore.Challenge())
-                await _cloudflare.Challenge(
-                    context: Request.HttpContext
-                );
+                await _cloudflare.Challenge(context: Request.HttpContext);
 
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(
-                user: user
-            );
-            await _userManager.ConfirmEmailAsync(
-                user: user,
-                token: token
-            );
-            return RedirectToAction(
-                actionName: "Create",
-                controllerName: "Sessions"
-            );
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user: user);
+            await _userManager.ConfirmEmailAsync(user: user, token: token);
+            return RedirectToAction(actionName: "Create", controllerName: "Sessions");
         }
 
         await this.NotifyFraudDetectionSystemOf(
@@ -101,10 +87,7 @@ public class UsersController : Controller
         );
 
         foreach (var error in result.Errors)
-            ModelState.AddModelError(
-                key: string.Empty,
-                errorMessage: error.Description
-            );
+            ModelState.AddModelError(key: string.Empty, errorMessage: error.Description);
 
         return View(
             model: model
