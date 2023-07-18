@@ -1,6 +1,8 @@
 using Castle;
+using MicropostsApp.Constants;
 using MicropostsApp.Extensions;
 using MicropostsApp.Models;
+using MicropostsApp.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,8 +10,6 @@ namespace MicropostsApp.Controllers;
 
 public class SessionsController : Controller
 {
-    private const float HighRiskThreshold = 0.8f;
-    private const float MediumRiskThreshold = 0.6f;
     private readonly CastleClient _castleClient;
     private readonly Cloudflare _cloudflare;
     private readonly SignInManager<User> _signInManager;
@@ -68,10 +68,10 @@ public class SessionsController : Controller
                 castleRequestToken: model.CastleRequestToken
             );
 
-            if (riskScore >= HighRiskThreshold)
+            if (riskScore >= RiskThresholds.High)
             {
-                await this.BlockIpAddress(
-                    cloudflare: _cloudflare
+                await _cloudflare.Block(
+                    context: Request.HttpContext
                 );
                 Response.StatusCode = 500;
                 return View(
@@ -79,9 +79,9 @@ public class SessionsController : Controller
                 );
             }
 
-            if (riskScore >= MediumRiskThreshold && riskScore < HighRiskThreshold)
-                await this.ChallengeIpAddress(
-                    cloudflare: _cloudflare
+            if (riskScore >= RiskThresholds.Medium && riskScore < RiskThresholds.High)
+                await _cloudflare.Challenge(
+                    context: Request.HttpContext
                 );
 
             return RedirectToAction(

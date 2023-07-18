@@ -1,9 +1,11 @@
 using System.Text;
 using Newtonsoft.Json;
 
+namespace MicropostsApp.Services;
+
 public class Cloudflare
 {
-    private readonly HttpClient _httpClient;
+    private static HttpClient _httpClient = null!;
 
     public Cloudflare(
         string email,
@@ -26,7 +28,52 @@ public class Cloudflare
         );
     }
 
-    public async Task PreventIpAddress(
+    public async Task Block(
+        HttpContext context
+    )
+    {
+        var ipAddress = GetIpAddress(
+            context: context
+        );
+        await PreventIpAddress(
+            ipAddress: ipAddress,
+            mode: "block"
+        );
+    }
+
+    public async Task Challenge(
+        HttpContext context
+    )
+    {
+        var ipAddress = GetIpAddress(
+            context: context
+        );
+        await PreventIpAddress(
+            ipAddress: ipAddress,
+            mode: "challenge"
+        );
+    }
+
+    private static string GetIpAddress(
+        HttpContext context
+    )
+    {
+        if (context.Request.Headers.TryGetValue(
+                key: "X-Forwarded-For",
+                value: out var forwardedFor
+            ))
+        {
+            var ips = forwardedFor.ToString().Split(
+                separator: ',',
+                options: StringSplitOptions.TrimEntries
+            );
+            return ips[0];
+        }
+
+        return context.Connection.RemoteIpAddress?.ToString() ?? string.Empty;
+    }
+
+    private static async Task PreventIpAddress(
         string ipAddress,
         string mode
     )

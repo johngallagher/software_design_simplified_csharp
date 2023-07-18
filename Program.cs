@@ -2,6 +2,7 @@ using Castle;
 using Castle.Config;
 using MicropostsApp.Data;
 using MicropostsApp.Models;
+using MicropostsApp.Services;
 using Microsoft.EntityFrameworkCore;
 
 internal class Program
