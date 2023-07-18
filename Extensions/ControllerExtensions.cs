@@ -1,6 +1,7 @@
 using Castle;
 using Castle.Messages.Requests;
 using Castle.Messages;
+using MicropostsApp.Interfaces;
 using MicropostsApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,7 +9,7 @@ namespace MicropostsApp.Extensions;
 
 public static class ControllerExtensions
 {
-    public static async Task<Policy> FetchPolicy(
+    public static async Task<IProtectable> FetchPolicy(
         this Controller controller,
         CastleClient castleClient,
         User? user,
@@ -41,7 +42,7 @@ public static class ControllerExtensions
         return new Policy(action: response.Policy.Action);
     }
 
-    public static async Task<RiskScore> FetchRiskScore(
+    public static async Task<IProtectable> FetchRiskScore(
         this Controller controller,
         CastleClient castleClient,
         User? user,
