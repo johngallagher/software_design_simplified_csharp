@@ -2,7 +2,6 @@ using Castle;
 using MicropostsApp.Data;
 using MicropostsApp.Extensions;
 using MicropostsApp.Models;
-using MicropostsApp.Services;
 using MicropostsApp.Services.Protectors;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -15,7 +14,6 @@ namespace MicropostsApp.Controllers;
 public class MicropostsController : Controller
 {
     private readonly CastleClient _castleClient;
-    private readonly Cloudflare _cloudflare;
     private readonly CastleProtector _castleProtector;
     private readonly ApplicationDbContext _context;
     private readonly UserManager<User> _userManager;
@@ -24,14 +22,12 @@ public class MicropostsController : Controller
         ApplicationDbContext context,
         UserManager<User> userManager,
         CastleClient castleClient,
-        Cloudflare cloudflare,
         CastleProtector castleProtector
     )
     {
         _context = context;
         _userManager = userManager;
         _castleClient = castleClient;
-        _cloudflare = cloudflare;
         _castleProtector = castleProtector;
     }
 
