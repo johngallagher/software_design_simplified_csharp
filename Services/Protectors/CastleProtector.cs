@@ -77,10 +77,8 @@ public class CastleProtector
     public async Task NotifyOf(
         string type,
         string status,
-        string userEmail,
-        string castleRequestToken,
         HttpRequest request,
-        IUserOperation registration
+        IUserOperation operation
     )
     {
         try
@@ -90,11 +88,11 @@ public class CastleProtector
                 {
                     Type = type,
                     Status = status,
-                    RequestToken = registration.CastleRequestToken,
+                    RequestToken = operation.CastleRequestToken,
                     Context = Context.FromHttpRequest(request: request),
                     User = new Dictionary<string, object>
                     {
-                        { "email", registration.Email }
+                        { "email", operation.Email }
                     }
                 }
             );

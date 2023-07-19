@@ -37,10 +37,8 @@ public class UsersController : Controller
         await _protector.NotifyOf(
             type: "$registration",
             status: "$attempted",
-            userEmail: registration.Email,
-            castleRequestToken: registration.CastleRequestToken,
             request: Request,
-            registration: registration
+            operation: registration
         );
         var result = await _userManager.CreateAsync(
             user: user,
@@ -70,10 +68,8 @@ public class UsersController : Controller
         await _protector.NotifyOf(
             type: "$registration",
             status: "$failed",
-            userEmail: registration.Email,
-            castleRequestToken: registration.CastleRequestToken,
             request: Request,
-            registration: registration
+            operation: registration
         );
 
         foreach (var error in result.Errors)

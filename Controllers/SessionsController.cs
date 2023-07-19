@@ -29,33 +29,31 @@ public class SessionsController : Controller
 
     [HttpPost]
     public async Task<IActionResult> Create(
-        LoginViewModel registration
+        LoginViewModel login
     )
     {
         if (!ModelState.IsValid)
             return View(
-                model: registration
+                model: login
             );
 
         await _protector.NotifyOf(
             type: "$login",
             status: "$attempted",
-            userEmail: registration.Email,
-            castleRequestToken: registration.CastleRequestToken,
             request: Request,
-            registration: registration
+            operation: login
         );
         var result = await _signInManager.PasswordSignInAsync(
-            userName: registration.Email,
-            password: registration.Password,
+            userName: login.Email,
+            password: login.Password,
             isPersistent: false,
             lockoutOnFailure: false
         );
         if (result.Succeeded)
         {
             var policy = await _protector.Protect(
-                user: await _userManager.FindByEmailAsync(email: registration.Email),
-                castleRequestToken: registration.CastleRequestToken,
+                user: await _userManager.FindByEmailAsync(email: login.Email),
+                castleRequestToken: login.CastleRequestToken,
                 httpContext: HttpContext,
                 type: "$login",
                 status: "$succeeded"
@@ -73,10 +71,8 @@ public class SessionsController : Controller
         await _protector.NotifyOf(
             type: "$login",
             status: "$failed",
-            userEmail: registration.Email,
-            castleRequestToken: registration.CastleRequestToken,
             request: Request,
-            registration: registration
+            operation: login
         );
 
         ModelState.AddModelError(
@@ -84,7 +80,7 @@ public class SessionsController : Controller
             errorMessage: result.ToString()
         );
         return View(
-            model: registration
+            model: login
         );
     }
 }
