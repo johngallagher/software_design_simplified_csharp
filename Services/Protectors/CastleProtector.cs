@@ -23,6 +23,7 @@ public class CastleProtector
         string castleRequestToken,
         string type,
         HttpContext httpContext,
+        Event @event,
         string? name = null,
         string? status = null
     )
@@ -37,8 +38,8 @@ public class CastleProtector
                 var response = await _client.Risk(
                     request: new ActionRequest
                     {
-                        Type = type,
-                        Status = status,
+                        Type = ToType(@event: @event),
+                        Status = ToStatus(@event: @event),
                         Name = name,
                         RequestToken = castleRequestToken,
                         Context = Context.FromHttpRequest(request: httpContext.Request),
@@ -88,7 +89,7 @@ public class CastleProtector
                 request: new ActionRequest
                 {
                     Type = ToType(@event: @event),
-                    Status = status,
+                    Status = ToStatus(@event: @event),
                     RequestToken = operation.CastleRequestToken,
                     Context = Context.FromHttpRequest(request: request),
                     User = new Dictionary<string, object>
@@ -116,6 +117,30 @@ public class CastleProtector
             case Event.RegistrationSucceeded:
             case Event.RegistrationFailed:
                 return "$registration";
+            case Event.MicropostCreated:
+                return "$custom";
+            default:
+                throw new ArgumentOutOfRangeException(
+                    paramName: nameof(@event),
+                    actualValue: @event,
+                    message: "Invalid event name"
+                );
+        }
+    }
+    
+    private string? ToStatus(Event @event)
+    {
+        switch (@event)
+        {
+            case Event.LoginAttempted:
+            case Event.RegistrationAttempted:
+                return "$attempted";
+            case Event.LoginSucceeded:
+            case Event.RegistrationSucceeded:
+                return "$succeeded";
+            case Event.LoginFailed:
+            case Event.RegistrationFailed:
+                return "$failed";
             case Event.MicropostCreated:
                 return null;
             default:

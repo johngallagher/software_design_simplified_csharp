@@ -55,8 +55,9 @@ public class SessionsController : Controller
             var policy = await _protector.Protect(
                 user: await _userManager.FindByEmailAsync(email: login.Email),
                 castleRequestToken: login.CastleRequestToken,
-                httpContext: HttpContext,
                 type: "$login",
+                httpContext: HttpContext,
+                @event: Event.LoginSucceeded,
                 status: "$succeeded"
             );
 

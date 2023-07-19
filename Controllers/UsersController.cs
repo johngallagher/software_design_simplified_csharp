@@ -50,8 +50,9 @@ public class UsersController : Controller
             var policy = await _protector.Protect(
                 user: user,
                 castleRequestToken: registration.CastleRequestToken,
-                httpContext: HttpContext,
                 type: "$registration",
+                httpContext: HttpContext,
+                @event: Event.RegistrationSucceeded,
                 status: "$succeeded"
             );
 
