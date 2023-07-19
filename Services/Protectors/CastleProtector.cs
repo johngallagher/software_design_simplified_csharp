@@ -10,7 +10,7 @@ namespace MicropostsApp.Services.Protectors;
 
 public class CastleProtector
 {
-    public static async Task<IProtectable> ProtectFromBadActors(
+    public async Task<IProtectable> ProtectFromBadActors(
         Controller controller,
         CastleClient castleClient,
         User? user,
@@ -67,6 +67,39 @@ public class CastleProtector
         catch (CastleExternalException)
         {
             return new Policy(action: ActionType.Allow);
+        }
+    }
+
+    public static async Task NotifyFraudDetectionSystemOf(
+        Controller controller,
+        string type,
+        string status,
+        string userEmail,
+        CastleClient castleClient,
+        string castleRequestToken
+    )
+    {
+        try
+        {
+            await castleClient.Filter(
+                request: new ActionRequest
+                {
+                    Type = type,
+                    Status = status,
+                    RequestToken = castleRequestToken,
+                    Context = Context.FromHttpRequest(
+                        request: controller.Request
+                    ),
+                    User = new Dictionary<string, object>
+                    {
+                        { "email", userEmail }
+                    }
+                }
+            );
+        }
+        catch (Exception)
+        {
+            // ignored as there's nothing we can do to rescue
         }
     }
 }
