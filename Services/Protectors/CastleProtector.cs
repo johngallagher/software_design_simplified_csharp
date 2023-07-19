@@ -154,11 +154,6 @@ public class CastleProtector
 
     private string? ToName(Event @event)
     {
-        if (@event == Event.MicropostCreated)
-        {
-            return "Created a micropost";
-        }
-
-        return null;
+        return @event == Event.MicropostCreated ? "Created a micropost" : null;
     }
 }
