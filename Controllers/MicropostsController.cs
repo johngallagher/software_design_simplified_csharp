@@ -54,9 +54,7 @@ public class MicropostsController : Controller
             controller: this,
             type: "$custom",
             name: "Created a micropost",
-            user: await _userManager.GetUserAsync(
-                principal: User
-            ),
+            user: await _userManager.GetUserAsync(principal: User),
             castleRequestToken: model.CastleRequestToken
         );
 
