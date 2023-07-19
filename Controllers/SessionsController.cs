@@ -38,11 +38,9 @@ public class SessionsController : Controller
             );
 
         await _protector.NotifyOf(
-            type: "$login",
-            status: "$attempted",
+            @event: Event.LoginAttempted,
             request: Request,
-            operation: login,
-            @event: Event.LoginAttempted
+            operation: login
         );
         var result = await _signInManager.PasswordSignInAsync(
             userName: login.Email,
@@ -53,12 +51,10 @@ public class SessionsController : Controller
         if (result.Succeeded)
         {
             var policy = await _protector.Protect(
+                @event: Event.LoginSucceeded,
                 user: await _userManager.FindByEmailAsync(email: login.Email),
                 castleRequestToken: login.CastleRequestToken,
-                type: "$login",
-                httpContext: HttpContext,
-                @event: Event.LoginSucceeded,
-                status: "$succeeded"
+                httpContext: HttpContext
             );
 
             if (policy.Deny())
@@ -71,11 +67,9 @@ public class SessionsController : Controller
         }
 
         await _protector.NotifyOf(
-            type: "$login",
-            status: "$failed",
+            @event: Event.LoginFailed,
             request: Request,
-            operation: login,
-            @event: Event.LoginFailed
+            operation: login
         );
 
         ModelState.AddModelError(

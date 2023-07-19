@@ -19,13 +19,10 @@ public class CastleProtector
     }
 
     public async Task<Protectable> Protect(
+        Event @event,
         User? user,
         string castleRequestToken,
-        string type,
-        HttpContext httpContext,
-        Event @event,
-        string? name = null,
-        string? status = null
+        HttpContext httpContext
     )
     {
         try
@@ -76,11 +73,9 @@ public class CastleProtector
     }
 
     public async Task NotifyOf(
-        string type,
-        string status,
+        Event @event,
         HttpRequest request,
-        UserOperation operation,
-        Event @event
+        UserOperation operation
     )
     {
         try
