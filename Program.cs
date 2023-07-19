@@ -46,7 +46,12 @@ internal class Program
         );
 
         builder.Services.AddSingleton(
-            implementationInstance: new CastleProtector()
+            implementationInstance: new CastleProtector(
+                cloudflare: new Cloudflare(
+                    email: builder.Configuration[key: "Cloudflare:Email"],
+                    apiKey: builder.Configuration[key: "Cloudflare:Key"]
+                )
+            )
         );
 
         var app = builder.Build();

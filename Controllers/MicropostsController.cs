@@ -64,7 +64,6 @@ public class MicropostsController : Controller
             type: "$custom",
             name: "Created a micropost",
             castleClient: _castleClient,
-            cloudflare: _cloudflare,
             user: await _userManager.GetUserAsync(
                 principal: User
             ),

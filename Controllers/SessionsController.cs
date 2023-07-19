@@ -67,7 +67,6 @@ public class SessionsController : Controller
                 type: "$login",
                 status: "$succeeded",
                 castleClient: _castleClient,
-                cloudflare: _cloudflare,
                 user: await _userManager.FindByEmailAsync(email: model.Email),
                 castleRequestToken: model.CastleRequestToken
             );

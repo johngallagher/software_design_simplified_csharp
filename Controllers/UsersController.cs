@@ -63,7 +63,6 @@ public class UsersController : Controller
                 type: "$registration",
                 status: "$succeeded",
                 castleClient: _castleClient,
-                cloudflare: _cloudflare,
                 user: user,
                 castleRequestToken: model.CastleRequestToken
             );

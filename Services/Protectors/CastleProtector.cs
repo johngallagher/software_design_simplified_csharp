@@ -10,13 +10,19 @@ namespace MicropostsApp.Services.Protectors;
 
 public class CastleProtector
 {
+    private readonly Cloudflare _cloudflare;
+
+    public CastleProtector(Cloudflare cloudflare)
+    {
+        _cloudflare = cloudflare;
+    }
+
     public async Task<IProtectable> ProtectFromBadActors(
         Controller controller,
         CastleClient castleClient,
         User? user,
         string castleRequestToken,
         string type,
-        Cloudflare cloudflare,
         string? name = null,
         string? status = null
     )
@@ -50,12 +56,12 @@ public class CastleProtector
 
             if (policy.Deny())
             {
-                await cloudflare.Block(context: controller.HttpContext);
+                await _cloudflare.Block(context: controller.HttpContext);
             }
 
             if (policy.Challenge())
             {
-                await cloudflare.Challenge(context: controller.HttpContext);
+                await _cloudflare.Challenge(context: controller.HttpContext);
             }
 
             return policy;
