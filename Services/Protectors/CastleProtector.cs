@@ -78,7 +78,8 @@ public class CastleProtector
         string type,
         string status,
         HttpRequest request,
-        UserOperation operation
+        UserOperation operation,
+        Event @event
     )
     {
         try

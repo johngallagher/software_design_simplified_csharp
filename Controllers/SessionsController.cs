@@ -41,7 +41,8 @@ public class SessionsController : Controller
             type: "$login",
             status: "$attempted",
             request: Request,
-            operation: login
+            operation: login,
+            @event: Event.LoginAttempted
         );
         var result = await _signInManager.PasswordSignInAsync(
             userName: login.Email,
@@ -72,7 +73,8 @@ public class SessionsController : Controller
             type: "$login",
             status: "$failed",
             request: Request,
-            operation: login
+            operation: login,
+            @event: Event.LoginFailed
         );
 
         ModelState.AddModelError(

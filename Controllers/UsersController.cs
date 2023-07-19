@@ -38,7 +38,8 @@ public class UsersController : Controller
             type: "$registration",
             status: "$attempted",
             request: Request,
-            operation: registration
+            operation: registration,
+            @event: Event.RegistrationAttempted
         );
         var result = await _userManager.CreateAsync(
             user: user,
@@ -69,7 +70,8 @@ public class UsersController : Controller
             type: "$registration",
             status: "$failed",
             request: Request,
-            operation: registration
+            operation: registration,
+            @event: Event.RegistrationFailed
         );
 
         foreach (var error in result.Errors)
