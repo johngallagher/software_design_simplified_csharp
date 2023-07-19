@@ -31,13 +31,6 @@ internal class Program
         builder.Services.AddControllersWithViews();
 
         builder.Services.AddSingleton(
-            implementationInstance: new Cloudflare(
-                email: builder.Configuration[key: "Cloudflare:Email"],
-                apiKey: builder.Configuration[key: "Cloudflare:Key"]
-            )
-        );
-
-        builder.Services.AddSingleton(
             implementationInstance: new CastleProtector(
                 cloudflare: new Cloudflare(
                     email: builder.Configuration[key: "Cloudflare:Email"],
