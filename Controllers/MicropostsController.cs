@@ -44,15 +44,15 @@ public class MicropostsController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        MicropostViewModel model
+        MicropostViewModel post
     )
     {
         if (!ModelState.IsValid)
-            return View(model: model);
+            return View(model: post);
 
         var policy = await _protector.Protect(
             user: await _userManager.GetUserAsync(principal: User),
-            castleRequestToken: model.CastleRequestToken,
+            castleRequestToken: post.CastleRequestToken,
             httpContext: HttpContext,
             type: "$custom",
             name: "Created a micropost"
@@ -67,7 +67,7 @@ public class MicropostsController : Controller
         _context.Add(
             entity: new Micropost
             {
-                Content = model.Content
+                Content = post.Content
             }
         );
         await _context.SaveChangesAsync();
