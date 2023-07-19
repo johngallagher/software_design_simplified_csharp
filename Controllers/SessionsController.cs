@@ -2,6 +2,7 @@ using Castle;
 using MicropostsApp.Extensions;
 using MicropostsApp.Models;
 using MicropostsApp.Services;
+using MicropostsApp.Services.Protectors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,6 +12,7 @@ public class SessionsController : Controller
 {
     private readonly CastleClient _castleClient;
     private readonly Cloudflare _cloudflare;
+    private readonly CastleProtector _castleProtector;
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
 
@@ -18,13 +20,15 @@ public class SessionsController : Controller
         UserManager<User> userManager,
         SignInManager<User> signInManager,
         CastleClient castleClient,
-        Cloudflare cloudflare
+        Cloudflare cloudflare,
+        CastleProtector castleProtector
     )
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _castleClient = castleClient;
         _cloudflare = cloudflare;
+        _castleProtector = castleProtector;
     }
 
     public IActionResult Create()
@@ -42,7 +46,8 @@ public class SessionsController : Controller
                 model: model
             );
 
-        await this.NotifyFraudDetectionSystemOf(
+        await _castleProtector.NotifyFraudDetectionSystemOf(
+            controller: this,
             type: "$login",
             status: "$attempted",
             userEmail: model.Email,
@@ -57,7 +62,8 @@ public class SessionsController : Controller
         );
         if (result.Succeeded)
         {
-            var policy = await this.ProtectFromBadActors(
+            var policy = await _castleProtector.ProtectFromBadActors(
+                controller: this,
                 type: "$login",
                 status: "$succeeded",
                 castleClient: _castleClient,
@@ -75,7 +81,8 @@ public class SessionsController : Controller
             return RedirectToAction(actionName: "Index", controllerName: "Home");
         }
 
-        await this.NotifyFraudDetectionSystemOf(
+        await _castleProtector.NotifyFraudDetectionSystemOf(
+            controller: this,
             type: "$login",
             status: "$failed",
             userEmail: model.Email,
