@@ -57,23 +57,20 @@ public class SessionsController : Controller
         );
         if (result.Succeeded)
         {
-            var riskScore = await this.FetchRiskScore(
+            var policy = await this.ProtectFromBadActors(
                 type: "$login",
                 status: "$succeeded",
                 castleClient: _castleClient,
+                cloudflare: _cloudflare,
                 user: await _userManager.FindByEmailAsync(email: model.Email),
                 castleRequestToken: model.CastleRequestToken
             );
 
-            if (riskScore.Deny())
+            if (policy.Deny())
             {
-                await _cloudflare.Block(context: Request.HttpContext);
                 Response.StatusCode = 500;
                 return View(viewName: "Error500");
             }
-
-            if (riskScore.Challenge())
-                await _cloudflare.Challenge(context: Request.HttpContext);
 
             return RedirectToAction(actionName: "Index", controllerName: "Home");
         }

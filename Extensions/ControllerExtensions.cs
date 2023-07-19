@@ -1,14 +1,49 @@
+using System.Runtime.CompilerServices;
 using Castle;
 using Castle.Messages.Requests;
 using Castle.Messages;
 using MicropostsApp.Interfaces;
 using MicropostsApp.Models;
+using MicropostsApp.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MicropostsApp.Extensions;
 
 public static class ControllerExtensions
 {
+    public static async Task<IProtectable> ProtectFromBadActors(
+        this Controller controller,
+        CastleClient castleClient,
+        User? user,
+        string castleRequestToken,
+        string type,
+        Cloudflare cloudflare,
+        string? name = null,
+        string? status = null
+    )
+    {
+        var policy = await FetchPolicy(
+            controller: controller,
+            castleClient: castleClient,
+            user: user,
+            castleRequestToken: castleRequestToken,
+            type: type,
+            name: name,
+            status: status
+        );
+        if (policy.Deny())
+        {
+            await cloudflare.Block(context: controller.HttpContext);
+        }
+
+        if (policy.Challenge())
+        {
+            await cloudflare.Challenge(context: controller.HttpContext);
+        }
+
+        return policy;
+    }
+
     public static async Task<IProtectable> FetchPolicy(
         this Controller controller,
         CastleClient castleClient,

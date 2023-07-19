@@ -53,25 +53,20 @@ public class UsersController : Controller
         );
         if (result.Succeeded)
         {
-            var riskScore = await this.FetchRiskScore(
+            var policy = await this.ProtectFromBadActors(
                 type: "$registration",
                 status: "$succeeded",
                 castleClient: _castleClient,
+                cloudflare: _cloudflare,
                 user: user,
                 castleRequestToken: model.CastleRequestToken
             );
 
-            if (riskScore.Deny())
+            if (policy.Deny())
             {
-                await _cloudflare.Block(
-                    context: Request.HttpContext
-                );
                 Response.StatusCode = 500;
                 return View(viewName: "Error500");
             }
-
-            if (riskScore.Challenge())
-                await _cloudflare.Challenge(context: Request.HttpContext);
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user: user);
             await _userManager.ConfirmEmailAsync(user: user, token: token);

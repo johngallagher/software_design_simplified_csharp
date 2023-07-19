@@ -55,24 +55,22 @@ public class MicropostsController : Controller
         if (!ModelState.IsValid)
             return View(model: model);
 
-        var riskScore = await this.FetchRiskScore(
+        var policy = await this.ProtectFromBadActors(
             type: "$custom",
             name: "Created a micropost",
             castleClient: _castleClient,
+            cloudflare: _cloudflare,
             user: await _userManager.GetUserAsync(
                 principal: User
             ),
             castleRequestToken: model.CastleRequestToken
         );
-        if (riskScore.Deny())
+
+        if (policy.Deny())
         {
-            await _cloudflare.Block(context: Request.HttpContext);
             Response.StatusCode = 500;
             return View(viewName: "Error500");
         }
-
-        if (riskScore.Challenge())
-            await _cloudflare.Challenge(context: Request.HttpContext);
 
         _context.Add(
             entity: new Micropost
