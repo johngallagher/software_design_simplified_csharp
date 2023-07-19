@@ -3,6 +3,7 @@ using MicropostsApp.Data;
 using MicropostsApp.Extensions;
 using MicropostsApp.Models;
 using MicropostsApp.Services;
+using MicropostsApp.Services.Protectors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,17 +13,20 @@ public class UsersController : Controller
 {
     private readonly CastleClient _castleClient;
     private readonly Cloudflare _cloudflare;
+    private readonly CastleProtector _castleProtector;
     private readonly UserManager<User> _userManager;
 
     public UsersController(
         UserManager<User> userManager,
         CastleClient castleClient,
-        Cloudflare cloudflare
+        Cloudflare cloudflare,
+        CastleProtector castleProtector
     )
     {
         _userManager = userManager;
         _castleClient = castleClient;
         _cloudflare = cloudflare;
+        _castleProtector = castleProtector;
     }
 
     public IActionResult Create()
@@ -40,7 +44,8 @@ public class UsersController : Controller
             return View(model: model);
 
         var user = new User { UserName = model.Email, Email = model.Email };
-        await this.NotifyFraudDetectionSystemOf(
+        await _castleProtector.NotifyFraudDetectionSystemOf(
+            controller: this,
             type: "$registration",
             status: "$attempted",
             userEmail: model.Email,
@@ -53,7 +58,8 @@ public class UsersController : Controller
         );
         if (result.Succeeded)
         {
-            var policy = await this.ProtectFromBadActors(
+            var policy = await _castleProtector.ProtectFromBadActors(
+                controller: this,
                 type: "$registration",
                 status: "$succeeded",
                 castleClient: _castleClient,
@@ -73,7 +79,8 @@ public class UsersController : Controller
             return RedirectToAction(actionName: "Create", controllerName: "Sessions");
         }
 
-        await this.NotifyFraudDetectionSystemOf(
+        await _castleProtector.NotifyFraudDetectionSystemOf(
+            controller: this,
             type: "$registration",
             status: "$failed",
             userEmail: model.Email,

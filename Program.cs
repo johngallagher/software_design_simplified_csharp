@@ -3,6 +3,7 @@ using Castle.Config;
 using MicropostsApp.Data;
 using MicropostsApp.Models;
 using MicropostsApp.Services;
+using MicropostsApp.Services.Protectors;
 using Microsoft.EntityFrameworkCore;
 
 internal class Program
@@ -42,6 +43,10 @@ internal class Program
                 email: builder.Configuration[key: "Cloudflare:Email"],
                 apiKey: builder.Configuration[key: "Cloudflare:Key"]
             )
+        );
+
+        builder.Services.AddSingleton(
+            implementationInstance: new CastleProtector()
         );
 
         var app = builder.Build();
