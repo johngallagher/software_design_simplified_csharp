@@ -87,7 +87,7 @@ public class CastleProtector
             await _client.Filter(
                 request: new ActionRequest
                 {
-                    Type = type,
+                    Type = ToType(@event: @event),
                     Status = status,
                     RequestToken = operation.CastleRequestToken,
                     Context = Context.FromHttpRequest(request: request),
@@ -101,6 +101,29 @@ public class CastleProtector
         catch (Exception)
         {
             // ignored as there's nothing we can do to rescue
+        }
+    }
+
+    private string? ToType(Event @event)
+    {
+        switch (@event)
+        {
+            case Event.LoginAttempted:
+            case Event.LoginSucceeded:
+            case Event.LoginFailed:
+                return "$login";
+            case Event.RegistrationAttempted:
+            case Event.RegistrationSucceeded:
+            case Event.RegistrationFailed:
+                return "$registration";
+            case Event.MicropostCreated:
+                return null;
+            default:
+                throw new ArgumentOutOfRangeException(
+                    paramName: nameof(@event),
+                    actualValue: @event,
+                    message: "Invalid event name"
+                );
         }
     }
 }
