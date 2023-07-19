@@ -21,7 +21,6 @@ public class CastleProtector
 
     public async Task<IProtectable> ProtectFromBadActors(
         Controller controller,
-        CastleClient castleClient,
         User? user,
         string castleRequestToken,
         string type,
@@ -83,7 +82,6 @@ public class CastleProtector
         string type,
         string status,
         string userEmail,
-        CastleClient castleClient,
         string castleRequestToken
     )
     {

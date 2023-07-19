@@ -1,5 +1,3 @@
-using Castle;
-using MicropostsApp.Extensions;
 using MicropostsApp.Models;
 using MicropostsApp.Services.Protectors;
 using Microsoft.AspNetCore.Identity;
@@ -9,7 +7,6 @@ namespace MicropostsApp.Controllers;
 
 public class SessionsController : Controller
 {
-    private readonly CastleClient _castleClient;
     private readonly CastleProtector _castleProtector;
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
@@ -17,13 +14,11 @@ public class SessionsController : Controller
     public SessionsController(
         UserManager<User> userManager,
         SignInManager<User> signInManager,
-        CastleClient castleClient,
         CastleProtector castleProtector
     )
     {
         _userManager = userManager;
         _signInManager = signInManager;
-        _castleClient = castleClient;
         _castleProtector = castleProtector;
     }
 
@@ -47,7 +42,6 @@ public class SessionsController : Controller
             type: "$login",
             status: "$attempted",
             userEmail: model.Email,
-            castleClient: _castleClient,
             castleRequestToken: model.CastleRequestToken
         );
         var result = await _signInManager.PasswordSignInAsync(
@@ -62,7 +56,6 @@ public class SessionsController : Controller
                 controller: this,
                 type: "$login",
                 status: "$succeeded",
-                castleClient: _castleClient,
                 user: await _userManager.FindByEmailAsync(email: model.Email),
                 castleRequestToken: model.CastleRequestToken
             );
@@ -81,7 +74,6 @@ public class SessionsController : Controller
             type: "$login",
             status: "$failed",
             userEmail: model.Email,
-            castleClient: _castleClient,
             castleRequestToken: model.CastleRequestToken
         );
 

@@ -1,6 +1,3 @@
-using Castle;
-using MicropostsApp.Data;
-using MicropostsApp.Extensions;
 using MicropostsApp.Models;
 using MicropostsApp.Services.Protectors;
 using Microsoft.AspNetCore.Identity;
@@ -10,18 +7,15 @@ namespace MicropostsApp.Controllers;
 
 public class UsersController : Controller
 {
-    private readonly CastleClient _castleClient;
     private readonly CastleProtector _castleProtector;
     private readonly UserManager<User> _userManager;
 
     public UsersController(
         UserManager<User> userManager,
-        CastleClient castleClient,
         CastleProtector castleProtector
     )
     {
         _userManager = userManager;
-        _castleClient = castleClient;
         _castleProtector = castleProtector;
     }
 
@@ -45,7 +39,6 @@ public class UsersController : Controller
             type: "$registration",
             status: "$attempted",
             userEmail: model.Email,
-            castleClient: _castleClient,
             castleRequestToken: model.CastleRequestToken
         );
         var result = await _userManager.CreateAsync(
@@ -58,7 +51,6 @@ public class UsersController : Controller
                 controller: this,
                 type: "$registration",
                 status: "$succeeded",
-                castleClient: _castleClient,
                 user: user,
                 castleRequestToken: model.CastleRequestToken
             );
@@ -79,7 +71,6 @@ public class UsersController : Controller
             type: "$registration",
             status: "$failed",
             userEmail: model.Email,
-            castleClient: _castleClient,
             castleRequestToken: model.CastleRequestToken
         );
 

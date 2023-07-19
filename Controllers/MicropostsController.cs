@@ -1,6 +1,4 @@
-using Castle;
 using MicropostsApp.Data;
-using MicropostsApp.Extensions;
 using MicropostsApp.Models;
 using MicropostsApp.Services.Protectors;
 using Microsoft.AspNetCore.Authorization;
@@ -13,7 +11,6 @@ namespace MicropostsApp.Controllers;
 [Authorize]
 public class MicropostsController : Controller
 {
-    private readonly CastleClient _castleClient;
     private readonly CastleProtector _castleProtector;
     private readonly ApplicationDbContext _context;
     private readonly UserManager<User> _userManager;
@@ -21,13 +18,11 @@ public class MicropostsController : Controller
     public MicropostsController(
         ApplicationDbContext context,
         UserManager<User> userManager,
-        CastleClient castleClient,
         CastleProtector castleProtector
     )
     {
         _context = context;
         _userManager = userManager;
-        _castleClient = castleClient;
         _castleProtector = castleProtector;
     }
 
@@ -59,7 +54,6 @@ public class MicropostsController : Controller
             controller: this,
             type: "$custom",
             name: "Created a micropost",
-            castleClient: _castleClient,
             user: await _userManager.GetUserAsync(
                 principal: User
             ),
