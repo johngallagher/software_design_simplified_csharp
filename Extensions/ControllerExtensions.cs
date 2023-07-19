@@ -1,4 +1,5 @@
 using Castle;
+using Castle.Infrastructure.Exceptions;
 using Castle.Messages;
 using Castle.Messages.Requests;
 using MicropostsApp.Interfaces;
@@ -21,42 +22,53 @@ public static class ControllerExtensions
         string? status = null
     )
     {
-        IProtectable policy;
-        if (user == null)
-            policy = new Policy(action: ActionType.Allow);
-        else
+        try
         {
-            var response = await castleClient.Risk(
-                request: new ActionRequest
-                {
-                    Type = type,
-                    Status = status,
-                    Name = name,
-                    RequestToken = castleRequestToken,
-                    Context = Context.FromHttpRequest(
-                        request: controller.Request
-                    ),
-                    User = new Dictionary<string, object>
+            IProtectable policy;
+            if (user == null)
+                policy = new Policy(action: ActionType.Allow);
+            else
+            {
+                var response = await castleClient.Risk(
+                    request: new ActionRequest
                     {
-                        { "id", user.Id },
-                        { "email", user.Email ?? string.Empty }
+                        Type = type,
+                        Status = status,
+                        Name = name,
+                        RequestToken = castleRequestToken,
+                        Context = Context.FromHttpRequest(
+                            request: controller.Request
+                        ),
+                        User = new Dictionary<string, object>
+                        {
+                            { "id", user.Id },
+                            { "email", user.Email ?? string.Empty }
+                        }
                     }
-                }
-            );
-            policy = new Policy(action: response.Policy.Action);
-        }
+                );
+                policy = new Policy(action: response.Policy.Action);
+            }
 
-        if (policy.Deny())
+            if (policy.Deny())
+            {
+                await cloudflare.Block(context: controller.HttpContext);
+            }
+
+            if (policy.Challenge())
+            {
+                await cloudflare.Challenge(context: controller.HttpContext);
+            }
+
+            return policy;
+        }
+        catch (CastleInvalidTokenException)
         {
-            await cloudflare.Block(context: controller.HttpContext);
+            return new Policy(action: ActionType.Deny);
         }
-
-        if (policy.Challenge())
+        catch (CastleExternalException)
         {
-            await cloudflare.Challenge(context: controller.HttpContext);
+            return new Policy(action: ActionType.Allow);
         }
-
-        return policy;
     }
 
     public static async Task NotifyFraudDetectionSystemOf(
@@ -68,20 +80,27 @@ public static class ControllerExtensions
         string castleRequestToken
     )
     {
-        await castleClient.Filter(
-            request: new ActionRequest
-            {
-                Type = type,
-                Status = status,
-                RequestToken = castleRequestToken,
-                Context = Context.FromHttpRequest(
-                    request: controller.Request
-                ),
-                User = new Dictionary<string, object>
+        try
+        {
+            await castleClient.Filter(
+                request: new ActionRequest
                 {
-                    { "email", userEmail }
+                    Type = type,
+                    Status = status,
+                    RequestToken = castleRequestToken,
+                    Context = Context.FromHttpRequest(
+                        request: controller.Request
+                    ),
+                    User = new Dictionary<string, object>
+                    {
+                        { "email", userEmail }
+                    }
                 }
-            }
-        );
+            );
+        }
+        catch (Exception)
+        {
+            // ignored as there's nothing we can do to rescue
+        }
     }
 }
