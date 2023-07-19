@@ -70,7 +70,7 @@ public class CastleProtector
         }
     }
 
-    public static async Task NotifyFraudDetectionSystemOf(
+    public async Task NotifyFraudDetectionSystemOf(
         Controller controller,
         string type,
         string status,
