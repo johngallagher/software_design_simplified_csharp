@@ -29,32 +29,33 @@ public class SessionsController : Controller
 
     [HttpPost]
     public async Task<IActionResult> Create(
-        LoginViewModel model
+        LoginViewModel registration
     )
     {
         if (!ModelState.IsValid)
             return View(
-                model: model
+                model: registration
             );
 
         await _protector.NotifyOf(
             type: "$login",
             status: "$attempted",
-            userEmail: model.Email,
-            castleRequestToken: model.CastleRequestToken,
-            request: Request
+            userEmail: registration.Email,
+            castleRequestToken: registration.CastleRequestToken,
+            request: Request,
+            registration: registration
         );
         var result = await _signInManager.PasswordSignInAsync(
-            userName: model.Email,
-            password: model.Password,
+            userName: registration.Email,
+            password: registration.Password,
             isPersistent: false,
             lockoutOnFailure: false
         );
         if (result.Succeeded)
         {
             var policy = await _protector.Protect(
-                user: await _userManager.FindByEmailAsync(email: model.Email),
-                castleRequestToken: model.CastleRequestToken,
+                user: await _userManager.FindByEmailAsync(email: registration.Email),
+                castleRequestToken: registration.CastleRequestToken,
                 httpContext: HttpContext,
                 type: "$login",
                 status: "$succeeded"
@@ -72,9 +73,10 @@ public class SessionsController : Controller
         await _protector.NotifyOf(
             type: "$login",
             status: "$failed",
-            userEmail: model.Email,
-            castleRequestToken: model.CastleRequestToken,
-            request: Request
+            userEmail: registration.Email,
+            castleRequestToken: registration.CastleRequestToken,
+            request: Request,
+            registration: registration
         );
 
         ModelState.AddModelError(
@@ -82,7 +84,7 @@ public class SessionsController : Controller
             errorMessage: result.ToString()
         );
         return View(
-            model: model
+            model: registration
         );
     }
 }

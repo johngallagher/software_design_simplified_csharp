@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using MicropostsApp.Services.Protectors;
 
 namespace MicropostsApp.Models;
 
-public class RegisterViewModel
+public class RegisterViewModel : IUserOperation
 {
     [Required]
     [EmailAddress]

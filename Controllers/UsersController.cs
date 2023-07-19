@@ -27,29 +27,30 @@ public class UsersController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        RegisterViewModel model
+        RegisterViewModel registration
     )
     {
         if (!ModelState.IsValid)
-            return View(model: model);
+            return View(model: registration);
 
-        var user = new User { UserName = model.Email, Email = model.Email };
+        var user = new User { UserName = registration.Email, Email = registration.Email };
         await _protector.NotifyOf(
             type: "$registration",
             status: "$attempted",
-            userEmail: model.Email,
-            castleRequestToken: model.CastleRequestToken,
-            request: Request
+            userEmail: registration.Email,
+            castleRequestToken: registration.CastleRequestToken,
+            request: Request,
+            registration: registration
         );
         var result = await _userManager.CreateAsync(
             user: user,
-            password: model.Password
+            password: registration.Password
         );
         if (result.Succeeded)
         {
             var policy = await _protector.Protect(
                 user: user,
-                castleRequestToken: model.CastleRequestToken,
+                castleRequestToken: registration.CastleRequestToken,
                 httpContext: HttpContext,
                 type: "$registration",
                 status: "$succeeded"
@@ -69,16 +70,17 @@ public class UsersController : Controller
         await _protector.NotifyOf(
             type: "$registration",
             status: "$failed",
-            userEmail: model.Email,
-            castleRequestToken: model.CastleRequestToken,
-            request: Request
+            userEmail: registration.Email,
+            castleRequestToken: registration.CastleRequestToken,
+            request: Request,
+            registration: registration
         );
 
         foreach (var error in result.Errors)
             ModelState.AddModelError(key: string.Empty, errorMessage: error.Description);
 
         return View(
-            model: model
+            model: registration
         );
     }
 }

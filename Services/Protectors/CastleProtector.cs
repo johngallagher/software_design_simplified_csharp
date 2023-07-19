@@ -79,7 +79,8 @@ public class CastleProtector
         string status,
         string userEmail,
         string castleRequestToken,
-        HttpRequest request
+        HttpRequest request,
+        IUserOperation registration
     )
     {
         try
@@ -89,11 +90,11 @@ public class CastleProtector
                 {
                     Type = type,
                     Status = status,
-                    RequestToken = castleRequestToken,
+                    RequestToken = registration.CastleRequestToken,
                     Context = Context.FromHttpRequest(request: request),
                     User = new Dictionary<string, object>
                     {
-                        { "email", userEmail }
+                        { "email", registration.Email }
                     }
                 }
             );
@@ -103,4 +104,10 @@ public class CastleProtector
             // ignored as there's nothing we can do to rescue
         }
     }
+}
+
+public abstract class IUserOperation
+{
+    public string Email;
+    public string CastleRequestToken;
 }
