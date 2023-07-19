@@ -36,7 +36,7 @@ internal class Program
                     email: builder.Configuration[key: "Cloudflare:Email"],
                     apiKey: builder.Configuration[key: "Cloudflare:Key"]
                 ),
-                castleClient: new CastleClient(
+                client: new CastleClient(
                     configuration: new CastleConfiguration(
                         apiSecret: builder.Configuration[key: "Castle:ApiSecret"]
                     )
