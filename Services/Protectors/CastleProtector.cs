@@ -19,7 +19,7 @@ public class CastleProtector
         _castleClient = castleClient;
     }
 
-    public async Task<IProtectable> ProtectFromBadActors(
+    public async Task<IProtectable> Protect(
         Controller controller,
         User? user,
         string castleRequestToken,
@@ -77,7 +77,7 @@ public class CastleProtector
         }
     }
 
-    public async Task NotifyFraudDetectionSystemOf(
+    public async Task NotifyOf(
         Controller controller,
         string type,
         string status,

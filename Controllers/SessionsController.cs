@@ -37,7 +37,7 @@ public class SessionsController : Controller
                 model: model
             );
 
-        await _protector.NotifyFraudDetectionSystemOf(
+        await _protector.NotifyOf(
             controller: this,
             type: "$login",
             status: "$attempted",
@@ -52,7 +52,7 @@ public class SessionsController : Controller
         );
         if (result.Succeeded)
         {
-            var policy = await _protector.ProtectFromBadActors(
+            var policy = await _protector.Protect(
                 controller: this,
                 type: "$login",
                 status: "$succeeded",
@@ -69,7 +69,7 @@ public class SessionsController : Controller
             return RedirectToAction(actionName: "Index", controllerName: "Home");
         }
 
-        await _protector.NotifyFraudDetectionSystemOf(
+        await _protector.NotifyOf(
             controller: this,
             type: "$login",
             status: "$failed",

@@ -34,7 +34,7 @@ public class UsersController : Controller
             return View(model: model);
 
         var user = new User { UserName = model.Email, Email = model.Email };
-        await _protector.NotifyFraudDetectionSystemOf(
+        await _protector.NotifyOf(
             controller: this,
             type: "$registration",
             status: "$attempted",
@@ -47,7 +47,7 @@ public class UsersController : Controller
         );
         if (result.Succeeded)
         {
-            var policy = await _protector.ProtectFromBadActors(
+            var policy = await _protector.Protect(
                 controller: this,
                 type: "$registration",
                 status: "$succeeded",
@@ -66,7 +66,7 @@ public class UsersController : Controller
             return RedirectToAction(actionName: "Create", controllerName: "Sessions");
         }
 
-        await _protector.NotifyFraudDetectionSystemOf(
+        await _protector.NotifyOf(
             controller: this,
             type: "$registration",
             status: "$failed",

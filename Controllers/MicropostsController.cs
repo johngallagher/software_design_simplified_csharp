@@ -50,7 +50,7 @@ public class MicropostsController : Controller
         if (!ModelState.IsValid)
             return View(model: model);
 
-        var policy = await _protector.ProtectFromBadActors(
+        var policy = await _protector.Protect(
             controller: this,
             type: "$custom",
             name: "Created a micropost",
