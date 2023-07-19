@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="LimitedWIPPluginSettings">
+    <option name="autoRevertEnabled" value="true" />
+    <option name="commitMessageSource" value="ChangeListName" />
+    <option name="maxLinesInChange" value="20" />
+    <option name="migratedFromOldLocation" value="true" />
+    <option name="notifyOnTcrRevert" value="true" />
+    <option name="timeTillRevert" value="5" />
+  </component>
+</project>
