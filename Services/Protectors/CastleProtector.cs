@@ -106,6 +106,6 @@ public class CastleProtector
 
 public abstract class IUserOperation
 {
-    public string Email;
-    public string CastleRequestToken;
+    public readonly string Email = null!;
+    public readonly string CastleRequestToken = null!;
 }
