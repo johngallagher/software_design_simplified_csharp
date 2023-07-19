@@ -23,8 +23,4 @@
         <Folder Include="Constants\" />
     </ItemGroup>
 
-    <ItemGroup>
-      <EditorConfigFiles Include=".editorconfig" />
-    </ItemGroup>
-
 </Project>
