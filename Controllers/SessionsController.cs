@@ -7,19 +7,19 @@ namespace MicropostsApp.Controllers;
 
 public class SessionsController : Controller
 {
-    private readonly CastleProtector _castleProtector;
+    private readonly CastleProtector _protector;
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
 
     public SessionsController(
         UserManager<User> userManager,
         SignInManager<User> signInManager,
-        CastleProtector castleProtector
+        CastleProtector protector
     )
     {
         _userManager = userManager;
         _signInManager = signInManager;
-        _castleProtector = castleProtector;
+        _protector = protector;
     }
 
     public IActionResult Create()
@@ -37,7 +37,7 @@ public class SessionsController : Controller
                 model: model
             );
 
-        await _castleProtector.NotifyFraudDetectionSystemOf(
+        await _protector.NotifyFraudDetectionSystemOf(
             controller: this,
             type: "$login",
             status: "$attempted",
@@ -52,7 +52,7 @@ public class SessionsController : Controller
         );
         if (result.Succeeded)
         {
-            var policy = await _castleProtector.ProtectFromBadActors(
+            var policy = await _protector.ProtectFromBadActors(
                 controller: this,
                 type: "$login",
                 status: "$succeeded",
@@ -69,7 +69,7 @@ public class SessionsController : Controller
             return RedirectToAction(actionName: "Index", controllerName: "Home");
         }
 
-        await _castleProtector.NotifyFraudDetectionSystemOf(
+        await _protector.NotifyFraudDetectionSystemOf(
             controller: this,
             type: "$login",
             status: "$failed",

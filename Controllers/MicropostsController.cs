@@ -11,19 +11,19 @@ namespace MicropostsApp.Controllers;
 [Authorize]
 public class MicropostsController : Controller
 {
-    private readonly CastleProtector _castleProtector;
+    private readonly CastleProtector _protector;
     private readonly ApplicationDbContext _context;
     private readonly UserManager<User> _userManager;
 
     public MicropostsController(
         ApplicationDbContext context,
         UserManager<User> userManager,
-        CastleProtector castleProtector
+        CastleProtector protector
     )
     {
         _context = context;
         _userManager = userManager;
-        _castleProtector = castleProtector;
+        _protector = protector;
     }
 
     // GET: Microposts
@@ -50,7 +50,7 @@ public class MicropostsController : Controller
         if (!ModelState.IsValid)
             return View(model: model);
 
-        var policy = await _castleProtector.ProtectFromBadActors(
+        var policy = await _protector.ProtectFromBadActors(
             controller: this,
             type: "$custom",
             name: "Created a micropost",

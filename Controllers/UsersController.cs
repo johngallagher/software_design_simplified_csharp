@@ -7,16 +7,16 @@ namespace MicropostsApp.Controllers;
 
 public class UsersController : Controller
 {
-    private readonly CastleProtector _castleProtector;
+    private readonly CastleProtector _protector;
     private readonly UserManager<User> _userManager;
 
     public UsersController(
         UserManager<User> userManager,
-        CastleProtector castleProtector
+        CastleProtector protector
     )
     {
         _userManager = userManager;
-        _castleProtector = castleProtector;
+        _protector = protector;
     }
 
     public IActionResult Create()
@@ -34,7 +34,7 @@ public class UsersController : Controller
             return View(model: model);
 
         var user = new User { UserName = model.Email, Email = model.Email };
-        await _castleProtector.NotifyFraudDetectionSystemOf(
+        await _protector.NotifyFraudDetectionSystemOf(
             controller: this,
             type: "$registration",
             status: "$attempted",
@@ -47,7 +47,7 @@ public class UsersController : Controller
         );
         if (result.Succeeded)
         {
-            var policy = await _castleProtector.ProtectFromBadActors(
+            var policy = await _protector.ProtectFromBadActors(
                 controller: this,
                 type: "$registration",
                 status: "$succeeded",
@@ -66,7 +66,7 @@ public class UsersController : Controller
             return RedirectToAction(actionName: "Create", controllerName: "Sessions");
         }
 
-        await _castleProtector.NotifyFraudDetectionSystemOf(
+        await _protector.NotifyFraudDetectionSystemOf(
             controller: this,
             type: "$registration",
             status: "$failed",
