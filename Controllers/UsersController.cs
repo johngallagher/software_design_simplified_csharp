@@ -35,11 +35,11 @@ public class UsersController : Controller
 
         var user = new User { UserName = model.Email, Email = model.Email };
         await _protector.NotifyOf(
-            controller: this,
             type: "$registration",
             status: "$attempted",
             userEmail: model.Email,
-            castleRequestToken: model.CastleRequestToken
+            castleRequestToken: model.CastleRequestToken,
+            httpContext: HttpContext
         );
         var result = await _userManager.CreateAsync(
             user: user,
@@ -48,11 +48,11 @@ public class UsersController : Controller
         if (result.Succeeded)
         {
             var policy = await _protector.Protect(
-                controller: this,
-                type: "$registration",
-                status: "$succeeded",
                 user: user,
-                castleRequestToken: model.CastleRequestToken
+                castleRequestToken: model.CastleRequestToken,
+                httpContext: HttpContext,
+                type: "$registration",
+                status: "$succeeded"
             );
 
             if (policy.Deny())
@@ -67,11 +67,11 @@ public class UsersController : Controller
         }
 
         await _protector.NotifyOf(
-            controller: this,
             type: "$registration",
             status: "$failed",
             userEmail: model.Email,
-            castleRequestToken: model.CastleRequestToken
+            castleRequestToken: model.CastleRequestToken,
+            httpContext: HttpContext
         );
 
         foreach (var error in result.Errors)

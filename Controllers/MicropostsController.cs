@@ -51,11 +51,11 @@ public class MicropostsController : Controller
             return View(model: model);
 
         var policy = await _protector.Protect(
-            controller: this,
-            type: "$custom",
-            name: "Created a micropost",
             user: await _userManager.GetUserAsync(principal: User),
-            castleRequestToken: model.CastleRequestToken
+            castleRequestToken: model.CastleRequestToken,
+            httpContext: HttpContext,
+            type: "$custom",
+            name: "Created a micropost"
         );
 
         if (policy.Deny())

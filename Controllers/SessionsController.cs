@@ -38,11 +38,11 @@ public class SessionsController : Controller
             );
 
         await _protector.NotifyOf(
-            controller: this,
             type: "$login",
             status: "$attempted",
             userEmail: model.Email,
-            castleRequestToken: model.CastleRequestToken
+            castleRequestToken: model.CastleRequestToken,
+            httpContext: HttpContext
         );
         var result = await _signInManager.PasswordSignInAsync(
             userName: model.Email,
@@ -53,11 +53,11 @@ public class SessionsController : Controller
         if (result.Succeeded)
         {
             var policy = await _protector.Protect(
-                controller: this,
-                type: "$login",
-                status: "$succeeded",
                 user: await _userManager.FindByEmailAsync(email: model.Email),
-                castleRequestToken: model.CastleRequestToken
+                castleRequestToken: model.CastleRequestToken,
+                httpContext: HttpContext,
+                type: "$login",
+                status: "$succeeded"
             );
 
             if (policy.Deny())
@@ -70,11 +70,11 @@ public class SessionsController : Controller
         }
 
         await _protector.NotifyOf(
-            controller: this,
             type: "$login",
             status: "$failed",
             userEmail: model.Email,
-            castleRequestToken: model.CastleRequestToken
+            castleRequestToken: model.CastleRequestToken,
+            httpContext: HttpContext
         );
 
         ModelState.AddModelError(

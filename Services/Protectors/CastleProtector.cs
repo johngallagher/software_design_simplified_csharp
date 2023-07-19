@@ -4,7 +4,6 @@ using Castle.Messages;
 using Castle.Messages.Requests;
 using MicropostsApp.Interfaces;
 using MicropostsApp.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace MicropostsApp.Services.Protectors;
 
@@ -20,10 +19,10 @@ public class CastleProtector
     }
 
     public async Task<IProtectable> Protect(
-        Controller controller,
         User? user,
         string castleRequestToken,
         string type,
+        HttpContext httpContext,
         string? name = null,
         string? status = null
     )
@@ -43,7 +42,7 @@ public class CastleProtector
                         Name = name,
                         RequestToken = castleRequestToken,
                         Context = Context.FromHttpRequest(
-                            request: controller.Request
+                            request: httpContext.Request
                         ),
                         User = new Dictionary<string, object>
                         {
@@ -57,12 +56,12 @@ public class CastleProtector
 
             if (policy.Deny())
             {
-                await _cloudflare.Block(context: controller.HttpContext);
+                await _cloudflare.Block(context: httpContext);
             }
 
             if (policy.Challenge())
             {
-                await _cloudflare.Challenge(context: controller.HttpContext);
+                await _cloudflare.Challenge(context: httpContext);
             }
 
             return policy;
@@ -78,11 +77,11 @@ public class CastleProtector
     }
 
     public async Task NotifyOf(
-        Controller controller,
         string type,
         string status,
         string userEmail,
-        string castleRequestToken
+        string castleRequestToken,
+        HttpContext httpContext
     )
     {
         try
@@ -94,7 +93,7 @@ public class CastleProtector
                     Status = status,
                     RequestToken = castleRequestToken,
                     Context = Context.FromHttpRequest(
-                        request: controller.Request
+                        request: httpContext.Request
                     ),
                     User = new Dictionary<string, object>
                     {
