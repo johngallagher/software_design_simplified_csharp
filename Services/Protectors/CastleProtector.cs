@@ -7,7 +7,7 @@ using MicropostsApp.Models;
 
 namespace MicropostsApp.Services.Protectors;
 
-public class CastleProtector
+public class CastleProtector : Protector
 {
     private readonly Cloudflare _cloudflare;
     private readonly CastleClient _client;
