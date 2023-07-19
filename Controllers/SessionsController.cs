@@ -42,7 +42,7 @@ public class SessionsController : Controller
             status: "$attempted",
             userEmail: model.Email,
             castleRequestToken: model.CastleRequestToken,
-            httpContext: HttpContext
+            request: Request
         );
         var result = await _signInManager.PasswordSignInAsync(
             userName: model.Email,
@@ -74,7 +74,7 @@ public class SessionsController : Controller
             status: "$failed",
             userEmail: model.Email,
             castleRequestToken: model.CastleRequestToken,
-            httpContext: HttpContext
+            request: Request
         );
 
         ModelState.AddModelError(

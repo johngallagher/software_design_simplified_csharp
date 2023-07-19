@@ -39,7 +39,7 @@ public class UsersController : Controller
             status: "$attempted",
             userEmail: model.Email,
             castleRequestToken: model.CastleRequestToken,
-            httpContext: HttpContext
+            request: Request
         );
         var result = await _userManager.CreateAsync(
             user: user,
@@ -71,7 +71,7 @@ public class UsersController : Controller
             status: "$failed",
             userEmail: model.Email,
             castleRequestToken: model.CastleRequestToken,
-            httpContext: HttpContext
+            request: Request
         );
 
         foreach (var error in result.Errors)

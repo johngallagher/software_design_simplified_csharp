@@ -79,7 +79,7 @@ public class CastleProtector
         string status,
         string userEmail,
         string castleRequestToken,
-        HttpContext httpContext
+        HttpRequest request
     )
     {
         try
@@ -90,7 +90,7 @@ public class CastleProtector
                     Type = type,
                     Status = status,
                     RequestToken = castleRequestToken,
-                    Context = Context.FromHttpRequest(request: httpContext.Request),
+                    Context = Context.FromHttpRequest(request: request),
                     User = new Dictionary<string, object>
                     {
                         { "email", userEmail }
