@@ -19,4 +19,9 @@ public class LoginViewModel : UserOperation
     public bool RememberMe { get; set; }
 
     [Required] public string CastleRequestToken { get; set; }
+    
+    public string ProtectionToken
+    {
+        get { return CastleRequestToken; }
+    }
 }

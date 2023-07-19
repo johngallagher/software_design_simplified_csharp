@@ -53,7 +53,7 @@ public class MicropostsController : Controller
         var policy = await _protector.Protect(
             @event: Event.MicropostCreated,
             user: await _userManager.GetUserAsync(principal: User),
-            castleRequestToken: post.CastleRequestToken,
+            token: post.ProtectionToken,
             httpContext: HttpContext
         );
 

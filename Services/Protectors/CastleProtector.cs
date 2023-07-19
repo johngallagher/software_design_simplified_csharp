@@ -21,7 +21,7 @@ public class CastleProtector
     public async Task<Protectable> Protect(
         Event @event,
         User? user,
-        string castleRequestToken,
+        string token,
         HttpContext httpContext
     )
     {
@@ -38,7 +38,7 @@ public class CastleProtector
                         Type = ToType(@event: @event),
                         Status = ToStatus(@event: @event),
                         Name = ToName(@event: @event),
-                        RequestToken = castleRequestToken,
+                        RequestToken = token,
                         Context = Context.FromHttpRequest(request: httpContext.Request),
                         User = new Dictionary<string, object>
                         {
