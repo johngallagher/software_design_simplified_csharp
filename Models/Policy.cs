@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MicropostsApp.Models;
 
-public class Policy : IProtectable
+public class Policy : Protectable
 {
     private readonly ActionType _action;
 

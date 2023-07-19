@@ -18,7 +18,7 @@ public class CastleProtector
         _client = client;
     }
 
-    public async Task<IProtectable> Protect(
+    public async Task<Protectable> Protect(
         User? user,
         string castleRequestToken,
         string type,
@@ -29,7 +29,7 @@ public class CastleProtector
     {
         try
         {
-            IProtectable policy;
+            Protectable policy;
             if (user == null)
                 policy = new Policy(action: ActionType.Allow);
             else
@@ -78,7 +78,7 @@ public class CastleProtector
         string type,
         string status,
         HttpRequest request,
-        IUserOperation operation
+        UserOperation operation
     )
     {
         try
@@ -102,10 +102,4 @@ public class CastleProtector
             // ignored as there's nothing we can do to rescue
         }
     }
-}
-
-public abstract class IUserOperation
-{
-    public readonly string Email = null!;
-    public readonly string CastleRequestToken = null!;
 }

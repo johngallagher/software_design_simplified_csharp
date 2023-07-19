@@ -3,7 +3,7 @@ using MicropostsApp.Services.Protectors;
 
 namespace MicropostsApp.Models;
 
-public class RegisterViewModel : IUserOperation
+public class RegisterViewModel : UserOperation
 {
     [Required]
     [EmailAddress]
