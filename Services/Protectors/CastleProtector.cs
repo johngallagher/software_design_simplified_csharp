@@ -40,7 +40,7 @@ public class CastleProtector
                     {
                         Type = ToType(@event: @event),
                         Status = ToStatus(@event: @event),
-                        Name = name,
+                        Name = ToName(@event: @event),
                         RequestToken = castleRequestToken,
                         Context = Context.FromHttpRequest(request: httpContext.Request),
                         User = new Dictionary<string, object>
@@ -127,7 +127,7 @@ public class CastleProtector
                 );
         }
     }
-    
+
     private string? ToStatus(Event @event)
     {
         switch (@event)
@@ -150,5 +150,15 @@ public class CastleProtector
                     message: "Invalid event name"
                 );
         }
+    }
+
+    private string? ToName(Event @event)
+    {
+        if (@event == Event.MicropostCreated)
+        {
+            return "Created a micropost";
+        }
+
+        return null;
     }
 }
