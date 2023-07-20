@@ -26,17 +26,20 @@ public class AwsProtector : Protector
     {
         if (httpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
         {
-            if (token.Contains("policy.action:deny"))
+            if (token.Contains(value: "policy.action:deny"))
             {
                 return Policy.CreateDeny();
             }
 
-            if (token.Contains("policy.action:allow"))
+            if (token.Contains(value: "policy.action:challenge"))
+            {
+                return Policy.CreateChallenge();
+            }
+
+            if (token.Contains(value: "policy.action:allow"))
             {
                 return Policy.CreateAllow();
             }
-
-            return Policy.CreateChallenge();
         }
 
         try
