@@ -1,3 +1,5 @@
+using Amazon;
+using Amazon.FraudDetector;
 using Castle;
 using Castle.Config;
 using MicropostsApp.Data;
@@ -40,6 +42,20 @@ internal class Program
                     configuration: new CastleConfiguration(
                         apiSecret: builder.Configuration[key: "Castle:ApiSecret"]
                     )
+                )
+            )
+        );
+
+        builder.Services.AddSingleton(
+            implementationInstance: new AwsProtector(
+                cloudflare: new Cloudflare(
+                    email: builder.Configuration[key: "Cloudflare:Email"],
+                    apiKey: builder.Configuration[key: "Cloudflare:Key"]
+                ),
+                client: new AmazonFraudDetectorClient(
+                    awsAccessKeyId: builder.Configuration[key: "AwsAccessKeyId"],
+                    awsSecretAccessKey: builder.Configuration[key: "AwsSecretAccessKey"],
+                    region: RegionEndpoint.EUWest1
                 )
             )
         );
