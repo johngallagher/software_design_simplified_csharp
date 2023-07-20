@@ -24,6 +24,21 @@ public class AwsProtector : Protector
         HttpContext httpContext
     )
     {
+        if (httpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
+        {
+            if (token.Contains("policy.action:deny"))
+            {
+                return Policy.CreateDeny();
+            }
+
+            if (token.Contains("policy.action:allow"))
+            {
+                return Policy.CreateAllow();
+            }
+
+            return Policy.CreateChallenge();
+        }
+
         try
         {
             Protectable policy;
@@ -78,6 +93,16 @@ public class AwsProtector : Protector
         public static Policy CreateAllow()
         {
             return new Policy(outcome: "allow");
+        }
+
+        public static Protectable CreateChallenge()
+        {
+            return new Policy(outcome: "friction");
+        }
+
+        public static Protectable CreateDeny()
+        {
+            return new Policy(outcome: "fraud");
         }
 
         public static Policy FromResponse(GetEventPredictionResponse response)
