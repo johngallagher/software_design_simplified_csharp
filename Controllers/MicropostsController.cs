@@ -1,4 +1,5 @@
 using MicropostsApp.Data;
+using MicropostsApp.Interfaces;
 using MicropostsApp.Models;
 using MicropostsApp.Services.Protectors;
 using Microsoft.AspNetCore.Authorization;
@@ -11,14 +12,14 @@ namespace MicropostsApp.Controllers;
 [Authorize]
 public class MicropostsController : Controller
 {
-    private readonly CastleProtector _protector;
+    private readonly Protector _protector;
     private readonly ApplicationDbContext _context;
     private readonly UserManager<User> _userManager;
 
     public MicropostsController(
         ApplicationDbContext context,
         UserManager<User> userManager,
-        CastleProtector protector
+        Protector protector
     )
     {
         _context = context;

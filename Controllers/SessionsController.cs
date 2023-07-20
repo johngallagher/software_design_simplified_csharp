@@ -1,3 +1,4 @@
+using MicropostsApp.Interfaces;
 using MicropostsApp.Models;
 using MicropostsApp.Services.Protectors;
 using Microsoft.AspNetCore.Identity;
@@ -7,14 +8,14 @@ namespace MicropostsApp.Controllers;
 
 public class SessionsController : Controller
 {
-    private readonly CastleProtector _protector;
+    private readonly Protector _protector;
     private readonly SignInManager<User> _signInManager;
     private readonly UserManager<User> _userManager;
 
     public SessionsController(
         UserManager<User> userManager,
         SignInManager<User> signInManager,
-        CastleProtector protector
+        Protector protector
     )
     {
         _userManager = userManager;
