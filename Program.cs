@@ -32,19 +32,19 @@ internal class Program
 
         builder.Services.AddControllersWithViews();
 
-        builder.Services.AddSingleton(
-            implementationInstance: new CastleProtector(
-                cloudflare: new Cloudflare(
-                    email: builder.Configuration[key: "Cloudflare:Email"],
-                    apiKey: builder.Configuration[key: "Cloudflare:Key"]
-                ),
-                client: new CastleClient(
-                    configuration: new CastleConfiguration(
-                        apiSecret: builder.Configuration[key: "Castle:ApiSecret"]
-                    )
-                )
-            )
-        );
+        // builder.Services.AddSingleton(
+        //     implementationInstance: new CastleProtector(
+        //         cloudflare: new Cloudflare(
+        //             email: builder.Configuration[key: "Cloudflare:Email"],
+        //             apiKey: builder.Configuration[key: "Cloudflare:Key"]
+        //         ),
+        //         client: new CastleClient(
+        //             configuration: new CastleConfiguration(
+        //                 apiSecret: builder.Configuration[key: "Castle:ApiSecret"]
+        //             )
+        //         )
+        //     )
+        // );
 
         builder.Services.AddSingleton(
             implementationInstance: new AwsProtector(
