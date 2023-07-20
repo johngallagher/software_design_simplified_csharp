@@ -3,6 +3,7 @@ using Amazon.FraudDetector;
 using Castle;
 using Castle.Config;
 using MicropostsApp.Data;
+using MicropostsApp.Interfaces;
 using MicropostsApp.Models;
 using MicropostsApp.Services;
 using MicropostsApp.Services.Protectors;
@@ -32,21 +33,7 @@ internal class Program
 
         builder.Services.AddControllersWithViews();
 
-        // builder.Services.AddSingleton(
-        //     implementationInstance: new CastleProtector(
-        //         cloudflare: new Cloudflare(
-        //             email: builder.Configuration[key: "Cloudflare:Email"],
-        //             apiKey: builder.Configuration[key: "Cloudflare:Key"]
-        //         ),
-        //         client: new CastleClient(
-        //             configuration: new CastleConfiguration(
-        //                 apiSecret: builder.Configuration[key: "Castle:ApiSecret"]
-        //             )
-        //         )
-        //     )
-        // );
-
-        builder.Services.AddSingleton(
+        builder.Services.AddSingleton<Protector>(
             implementationInstance: new AwsProtector(
                 cloudflare: new Cloudflare(
                     email: builder.Configuration[key: "Cloudflare:Email"],
