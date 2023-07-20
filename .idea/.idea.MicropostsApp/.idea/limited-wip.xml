@@ -7,5 +7,6 @@
     <option name="migratedFromOldLocation" value="true" />
     <option name="notifyOnTcrRevert" value="true" />
     <option name="timeTillRevert" value="5" />
+    <option name="watchdogEnabled" value="false" />
   </component>
 </project>
