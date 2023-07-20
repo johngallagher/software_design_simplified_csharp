@@ -53,8 +53,8 @@ internal class Program
                     apiKey: builder.Configuration[key: "Cloudflare:Key"]
                 ),
                 client: new AmazonFraudDetectorClient(
-                    awsAccessKeyId: builder.Configuration[key: "AwsAccessKeyId"],
-                    awsSecretAccessKey: builder.Configuration[key: "AwsSecretAccessKey"],
+                    awsAccessKeyId: builder.Configuration[key: "Amazon:AwsAccessKeyId"],
+                    awsSecretAccessKey: builder.Configuration[key: "Amazon:AwsSecretAccessKey"],
                     region: RegionEndpoint.EUWest1
                 )
             )
