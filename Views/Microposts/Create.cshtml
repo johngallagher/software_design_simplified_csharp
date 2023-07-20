@@ -11,23 +11,8 @@
     </div>
     @if (ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
     {
-        <input type="hidden" name="CastleRequestToken"
+        <input type="hidden" name="ProtectionToken"
                value="@Context.Request.Query.GetValueOrDefault(key: "castleToken", defaultValue: "test|device:chrome_on_mac|risk:0.0")"/>
     }
     <button type="submit" class="btn btn-primary">Create</button>
 </form>
-
-<script src="~/lib/@@castleio/castle-js/dist/castle.browser.js"></script>
-
-@if (!ViewContext.HttpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
-{
-    <script>
-  Castle.configure({ pk: 'pk_BxFYyLuiXEfpueKQoFzpfLaGN6LHWpS7' });
-  var myForm = document.getElementById('createMicropostForm');
-
-  myForm.addEventListener(
-    'submit',
-    function (e) { Castle.injectTokenOnSubmit(e) }
-  );
-</script>
-}

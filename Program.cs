@@ -1,7 +1,5 @@
 using Amazon;
 using Amazon.FraudDetector;
-using Castle;
-using Castle.Config;
 using MicropostsApp.Data;
 using MicropostsApp.Interfaces;
 using MicropostsApp.Models;

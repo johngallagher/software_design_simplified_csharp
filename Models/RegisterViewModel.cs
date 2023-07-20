@@ -38,10 +38,5 @@ public class RegisterViewModel : UserOperation
     )]
     public string ConfirmPassword { get; set; }
 
-    [Required] public string CastleRequestToken { get; set; }
-
-    public string ProtectionToken
-    {
-        get { return CastleRequestToken; }
-    }
+    [Required] public string ProtectionToken { get; set; }
 }
