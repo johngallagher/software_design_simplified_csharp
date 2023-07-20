@@ -24,39 +24,46 @@ public class AwsProtector : Protector
         HttpContext httpContext
     )
     {
-        Protectable policy;
-        if (user == null)
-            policy = Policy.CreateAllow();
-        else
+        try
         {
-            var request = new GetEventPredictionRequest()
+            Protectable policy;
+            if (user == null)
+                policy = Policy.CreateAllow();
+            else
             {
-                DetectorId = "default_detector",
-                EventId = httpContext.Request.Headers.RequestId,
-                EventTypeName = ToTypeName(@event: @event),
-                EventVariables = new Dictionary<string, string>
+                var request = new GetEventPredictionRequest()
                 {
-                    { "email", user?.Email ?? string.Empty },
-                    { "ip_address", GetIpAddress(context: httpContext) }
-                }
-            };
-            var response = await _client.GetEventPredictionAsync(
-                request: request
-            );
-            policy = Policy.FromResponse(response: response);
-        }
+                    DetectorId = "default_detector",
+                    EventId = httpContext.Request.Headers.RequestId,
+                    EventTypeName = ToTypeName(@event: @event),
+                    EventVariables = new Dictionary<string, string>
+                    {
+                        { "email", user?.Email ?? string.Empty },
+                        { "ip_address", GetIpAddress(context: httpContext) }
+                    }
+                };
+                var response = await _client.GetEventPredictionAsync(
+                    request: request
+                );
+                policy = Policy.FromResponse(response: response);
+            }
 
-        if (policy.Deny())
+            if (policy.Deny())
+            {
+                await _cloudflare.Block(context: httpContext);
+            }
+
+            if (policy.Challenge())
+            {
+                await _cloudflare.Challenge(context: httpContext);
+            }
+
+            return policy;
+        }
+        catch (AmazonFraudDetectorException)
         {
-            await _cloudflare.Block(context: httpContext);
+            return Policy.CreateAllow();
         }
-
-        if (policy.Challenge())
-        {
-            await _cloudflare.Challenge(context: httpContext);
-        }
-
-        return policy;
     }
 
     private class Policy : Protectable
@@ -96,19 +103,25 @@ public class AwsProtector : Protector
         UserOperation operation
     )
     {
-        await _client.SendEventAsync(
-            request: new SendEventRequest()
-            {
-                EventId = request.Headers.RequestId,
-                EventTypeName = ToTypeName(@event: @event),
-                EventVariables = new Dictionary<string, string>
+        try
+        {
+            await _client.SendEventAsync(
+                request: new SendEventRequest()
                 {
-                    { "email", operation.Email },
-                    { "ip_address", GetIpAddress(context: request.HttpContext) }
-                },
-                AssignedLabel = ToLabel(@event: @event)
-            }
-        );
+                    EventId = request.Headers.RequestId,
+                    EventTypeName = ToTypeName(@event: @event),
+                    EventVariables = new Dictionary<string, string>
+                    {
+                        { "email", operation.Email },
+                        { "ip_address", GetIpAddress(context: request.HttpContext) }
+                    },
+                    AssignedLabel = ToLabel(@event: @event)
+                }
+            );
+        }
+        catch (AmazonFraudDetectorException)
+        {
+        }
     }
 
     private static string GetIpAddress(
