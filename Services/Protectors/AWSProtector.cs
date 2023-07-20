@@ -24,23 +24,8 @@ public class AwsProtector : Protector
         HttpContext httpContext
     )
     {
-        if (httpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment())
-        {
-            if (token.Contains(value: "policy.action:deny"))
-            {
-                return Policy.CreateDeny();
-            }
-
-            if (token.Contains(value: "policy.action:challenge"))
-            {
-                return Policy.CreateChallenge();
-            }
-
-            if (token.Contains(value: "policy.action:allow"))
-            {
-                return Policy.CreateAllow();
-            }
-        }
+        if (UseHardCodedToken(token: token, httpContext: httpContext))
+            return PolicyFromToken(token: token);
 
         try
         {
@@ -82,6 +67,45 @@ public class AwsProtector : Protector
         {
             return Policy.CreateAllow();
         }
+    }
+
+    private Protectable PolicyFromToken(string token)
+    {
+        if (ContainsDeny(token: token))
+        {
+            return Policy.CreateDeny();
+        }
+
+        if (ContainsChallenge(token: token))
+        {
+            return Policy.CreateChallenge();
+        }
+
+        return Policy.CreateAllow();
+    }
+
+    private static bool UseHardCodedToken(string token, HttpContext httpContext)
+    {
+        return httpContext.RequestServices.GetRequiredService<IWebHostEnvironment>().IsDevelopment() &&
+            ContainsChallenge(token: token) || ContainsAllow(token: token) || ContainsDeny(token: token);
+    }
+
+    private static bool ContainsDeny(string token)
+    {
+        var containsDeny = token.Contains(value: "policy.action:deny");
+        return containsDeny;
+    }
+
+    private static bool ContainsAllow(string token)
+    {
+        var containsAllow = token.Contains(value: "policy.action:allow");
+        return containsAllow;
+    }
+
+    private static bool ContainsChallenge(string token)
+    {
+        var containsChallenge = token.Contains(value: "policy.action:challenge");
+        return containsChallenge;
     }
 
     private class Policy : Protectable
